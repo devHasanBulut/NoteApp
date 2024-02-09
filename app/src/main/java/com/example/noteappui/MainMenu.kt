@@ -21,6 +21,7 @@ fun MainMenu(notesModelDao: NotesModelDao, modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
+        BasicButton(notesModelDao)
         MainScreen()
         AllDate()
         AllCategory()

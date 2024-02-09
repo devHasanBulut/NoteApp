@@ -1,10 +1,14 @@
 package com.example.noteappui
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import com.example.noteappui.ui.theme.NoteAppUITheme
+import insertNote
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,15 +43,20 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var notesModelDao: NotesModelDao
 
-    @SuppressLint("CoroutineCreationDuringComposition")
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    @SuppressLint("CoroutineCreationDuringComposition", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+
 
         val database = AppDatabase.getInstance(applicationContext)
         notesModelDao = database.notesModelDao()
 
 
         setContent {
+            window.statusBarColor = getColor(R.color.black)
             NoteAppUITheme {
                 MainMenu(notesModelDao)
 

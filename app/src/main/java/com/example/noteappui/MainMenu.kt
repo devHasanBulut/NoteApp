@@ -1,5 +1,7 @@
 package com.example.noteappui
 
+import AllNotes
+import BasicButton
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable

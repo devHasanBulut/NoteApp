@@ -61,12 +61,14 @@ class MainActivity : ComponentActivity() {
                 MainMenu(notesModelDao)
 
 
+
             }
         }
 
 
     }
-    private  fun insert() {
+
+    fun insert() {
         val note1 = NotesModel(title = "tesst", description = "tesr descc")
         lifecycleScope.launch {
             insertNote(note1,notesModelDao)

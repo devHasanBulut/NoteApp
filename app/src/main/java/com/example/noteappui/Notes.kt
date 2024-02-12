@@ -1,12 +1,14 @@
+import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Button
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -16,9 +18,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -31,11 +35,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import com.example.noteappui.NotesModel
 import com.example.noteappui.NotesModelDao
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -135,8 +140,6 @@ fun BasicButton(notesModelDao: NotesModelDao) {
             buttonClicked = false
         }
     } else {
-
-
         Column(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -162,10 +165,14 @@ fun BasicButton(notesModelDao: NotesModelDao) {
     }
 }
 
+@Suppress("UNUSED_EXPRESSION")
 @Composable
-fun ButtonTest(notesModelDao: NotesModelDao,pressBack: () -> Unit) {
+fun ButtonTest(notesModelDao: NotesModelDao, pressBack: () -> Unit) {
+
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var buttonClicked by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier
@@ -181,16 +188,14 @@ fun ButtonTest(notesModelDao: NotesModelDao,pressBack: () -> Unit) {
             TextField(
                 //title
                 value = title,
-                onValueChange = { newText ->
-                    title = newText
+                onValueChange = {
+                    title = it
                 },
                 placeholder = {
                     Text(text = "Title..")
                 },
-
                 )
         }
-
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -200,7 +205,9 @@ fun ButtonTest(notesModelDao: NotesModelDao,pressBack: () -> Unit) {
             //description
             TextField(
                 value = description,
-                onValueChange = { description = it },
+                onValueChange = {
+                    description = it
+                   },
                 placeholder = {
                     Text(text = "Description..")
                 },
@@ -208,15 +215,33 @@ fun ButtonTest(notesModelDao: NotesModelDao,pressBack: () -> Unit) {
 
         }
 
+        Button(onClick = {buttonClicked = true }) {
+            Text("Save")
+
+        }
+        if (buttonClicked){
+            OnClick(notesModel = NotesModel(title = title, description = description), notesModelDao)
+
+        }
+
+        IconButton(
+            onClick = { pressBack() },
+            modifier = Modifier
+                .size(40.dp)
+        ) {
+            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "back button")
+        }
 
     }
+}
 
-    //insertNote(NotesModel(title = title, description = description), notesModelDao = notesModelDao)
+@SuppressLint("CoroutineCreationDuringComposition")
+@Composable
+fun OnClick(notesModel: NotesModel, notesModelDao: NotesModelDao) {
+    CoroutineScope(Dispatchers.IO).launch {
+        insertNote(notesModel, notesModelDao)
+    }
 }
 
 
 
-//IconButton(onClick = {pressBack()}) {
-//    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "back button")
-//
-//}

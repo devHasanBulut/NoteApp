@@ -3,12 +3,11 @@ package com.example.noteappui
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-
-@Entity(tableName = "notes")
-data class NotesModel(
+@Entity(tableName = "date")
+data class DateModel(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val title: String,
-    val description: String,
-    val categoryModel: CategoryModel
+    val dayName: String,
+    val day: Byte,
+    val month: String,
 )

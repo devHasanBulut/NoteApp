@@ -42,6 +42,8 @@ import kotlinx.coroutines.withContext
 class MainActivity : ComponentActivity() {
 
     private lateinit var notesModelDao: NotesModelDao
+    private lateinit var categoryModelDao: CategoryModelDao
+    private lateinit var dateModelDao: DateModelDao
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint("CoroutineCreationDuringComposition", "MissingInflatedId")
@@ -54,13 +56,18 @@ class MainActivity : ComponentActivity() {
         val database = AppDatabase.getInstance(applicationContext)
         notesModelDao = database.notesModelDao()
 
+        val categoryDatabase = AppDatabase.getInstance(applicationContext)
+        categoryModelDao = categoryDatabase.categoryModelDao()
+
+        val dateDatabase = AppDatabase.getInstance(applicationContext)
+        dateModelDao = dateDatabase.dateModelDao()
+
+
 
         setContent {
             window.statusBarColor = getColor(R.color.black)
             NoteAppUITheme {
-                MainMenu(notesModelDao)
-
-
+                MainMenu(notesModelDao,categoryModelDao, dateModelDao)
 
             }
         }
@@ -68,13 +75,4 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    fun insert() {
-        val note1 = NotesModel(title = "tesst", description = "tesr descc")
-        lifecycleScope.launch {
-            insertNote(note1,notesModelDao)
-        }
-    }
-
 }
-
-

@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 
 
 @Composable
-fun MainMenu(notesModelDao: NotesModelDao, modifier: Modifier = Modifier) {
+fun MainMenu(notesModelDao: NotesModelDao, categoryModelDao: CategoryModelDao,dateModelDao: DateModelDao,modifier: Modifier = Modifier) {
 
 
     Column(
@@ -23,10 +23,10 @@ fun MainMenu(notesModelDao: NotesModelDao, modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        BasicButton(notesModelDao)
+        BasicButton(notesModelDao, categoryModelDao)
         MainScreen()
-        AllDate()
-        AllCategory()
+        AllDate(dateModelDao)
+        AllCategory(categoryModelDao)
         AllNotes(notesModelDao = notesModelDao)
 
     }

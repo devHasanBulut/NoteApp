@@ -9,6 +9,9 @@ import androidx.room.RoomDatabase
 @Database(entities = [NotesModel::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun notesModelDao(): NotesModelDao
+    abstract fun categoryModelDao(): CategoryModelDao
+    abstract fun dateModelDao(): DateModelDao
+
 
     companion object {
         @Volatile

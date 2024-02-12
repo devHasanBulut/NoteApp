@@ -1,5 +1,6 @@
 package com.example.noteappui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,9 +14,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
 
@@ -59,8 +67,13 @@ fun Date(
     }
 }
 @Composable
-fun AllDate() {
-    val dayList = getMockDayList()
+fun AllDate(dateModelDao: DateModelDao) {
+    var dayList by remember {
+        mutableStateOf(emptyList<DateModel>())
+    }
+    LaunchedEffect(dateModelDao){
+        dayList = getAllDate(dateModelDao)
+    }
 
     LazyRow(
         modifier = Modifier
@@ -71,7 +84,6 @@ fun AllDate() {
 
     ) {
         items(dayList) { item ->
-
             Date(item.dayName, item.day, item.month)
         }
 
@@ -79,28 +91,48 @@ fun AllDate() {
 
 }
 
-fun getMockDayList(): List<DateModel> {
-    val currentCalendar = Calendar.getInstance()
-    val dateModelList = mutableListOf<DateModel>()
 
-    for (i in 0..7) {
-//        val days = arrayOf("SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY")
-//        val dayName = days.get(Calendar.DAY_OF_WEEK-1)
-        val dayName = currentCalendar.getDisplayName(
-            Calendar.DAY_OF_WEEK,
-            Calendar.SHORT,
-            Locale.getDefault()
-        )
-        val day = currentCalendar.get(Calendar.DAY_OF_MONTH)
-        val month =
-            currentCalendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
-        dateModelList.add(DateModel(dayName, day.toByte(), month!!))
-        currentCalendar.add(Calendar.DAY_OF_YEAR, 1)
+suspend fun insertDate(date: DateModel, dateModelDao: DateModelDao) {
+    withContext(Dispatchers.IO) {
+        dateModelDao.insertDate(date)
+        Log.d("MainActivity", "Note inserted: $date")
     }
-    return dateModelList
 }
-data class DateModel(
-    val dayName: String,
-    val day: Byte,
-    val month: String,
-)
+
+
+suspend fun deleteDate(date: List<DateModel>, dateModelDao: DateModelDao) {
+    withContext(Dispatchers.IO) {
+        date.forEach { date ->
+            dateModelDao.deleteDate(date)
+            Log.d("MainActivity", "Note deleted: $date")
+        }
+    }
+}
+suspend fun getAllDate(dateModelDao: DateModelDao): List<DateModel> {
+    return withContext(Dispatchers.IO) {
+        val date = getAllDate(dateModelDao)
+        Log.d("MainActivity", "Retrieved notes: $date")
+        date
+    }
+}
+
+//fun getMockDayList(): List<DateModel> {
+//    val currentCalendar = Calendar.getInstance()
+//    val dateModelList = mutableListOf<DateModel>()
+//
+//    for (i in 0..7) {
+////        val days = arrayOf("SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY")
+////        val dayName = days.get(Calendar.DAY_OF_WEEK-1)
+//        val dayName = currentCalendar.getDisplayName(
+//            Calendar.DAY_OF_WEEK,
+//            Calendar.SHORT,
+//            Locale.getDefault()
+//        )
+//        val day = currentCalendar.get(Calendar.DAY_OF_MONTH)
+//        val month =
+//            currentCalendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+//        dateModelList.add(DateModel(dayName, day.toByte(), month!!))
+//        currentCalendar.add(Calendar.DAY_OF_YEAR, 1)
+//    }
+//    return dateModelList
+//}

@@ -36,8 +36,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.noteappui.CategoryModel
+import com.example.noteappui.CategoryModelDao
 import com.example.noteappui.NotesModel
 import com.example.noteappui.NotesModelDao
+import com.example.noteappui.insertCategory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,16 +75,6 @@ fun AllNotes(
     }
 
 }
-
-
-suspend fun getAllNotes(notesModelDao: NotesModelDao): List<NotesModel> {
-    return withContext(Dispatchers.IO) {
-        val notes = notesModelDao.getAllNotes()
-        Log.d("MainActivity", "Retrieved notes: $notes")
-        notes
-    }
-}
-
 @Composable
 fun Notes(
     notesModel: NotesModel,
@@ -113,30 +106,11 @@ fun Notes(
 
 }
 
-
-suspend fun insertNote(note: NotesModel, notesModelDao: NotesModelDao) {
-    withContext(Dispatchers.IO) {
-        notesModelDao.insertNote(note)
-        Log.d("MainActivity", "Note inserted: $note")
-    }
-}
-
-
-suspend fun deleteNotes(notes: List<NotesModel>, notesModelDao: NotesModelDao) {
-    withContext(Dispatchers.IO) {
-        notes.forEach { note ->
-            notesModelDao.deleteNote(note)
-            Log.d("MainActivity", "Note deleted: $note")
-        }
-    }
-}
-
-
 @Composable
-fun BasicButton(notesModelDao: NotesModelDao) {
+fun BasicButton(notesModelDao: NotesModelDao, categoryModelDao: CategoryModelDao) {
     var buttonClicked by remember { mutableStateOf(false) }
     if (buttonClicked) {
-        ButtonTest(notesModelDao) {
+        ButtonTest(notesModelDao, categoryModelDao) {
             buttonClicked = false
         }
     } else {
@@ -167,7 +141,7 @@ fun BasicButton(notesModelDao: NotesModelDao) {
 
 @Suppress("UNUSED_EXPRESSION")
 @Composable
-fun ButtonTest(notesModelDao: NotesModelDao, pressBack: () -> Unit) {
+fun ButtonTest(notesModelDao: NotesModelDao,categoryModelDao: CategoryModelDao, pressBack: () -> Unit) {
 
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -213,6 +187,7 @@ fun ButtonTest(notesModelDao: NotesModelDao, pressBack: () -> Unit) {
                 },
             )
 
+
         }
 
         Button(onClick = {buttonClicked = true }) {
@@ -220,7 +195,8 @@ fun ButtonTest(notesModelDao: NotesModelDao, pressBack: () -> Unit) {
 
         }
         if (buttonClicked){
-            OnClick(notesModel = NotesModel(title = title, description = description), notesModelDao)
+            OnClick(notesModel = NotesModel(title = title, description = description, categoryModel = CategoryModel(categoryName = title)), notesModelDao, CategoryModel(categoryName = title), categoryModelDao)
+
 
         }
 
@@ -237,11 +213,35 @@ fun ButtonTest(notesModelDao: NotesModelDao, pressBack: () -> Unit) {
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun OnClick(notesModel: NotesModel, notesModelDao: NotesModelDao) {
+fun OnClick(notesModel: NotesModel, notesModelDao: NotesModelDao, categoryModel: CategoryModel,categoryModelDao: CategoryModelDao) {
     CoroutineScope(Dispatchers.IO).launch {
         insertNote(notesModel, notesModelDao)
+        insertCategory(categoryModel, categoryModelDao)
     }
 }
 
 
 
+suspend fun insertNote(note: NotesModel, notesModelDao: NotesModelDao) {
+    withContext(Dispatchers.IO) {
+        notesModelDao.insertNote(note)
+        Log.d("MainActivity", "Note inserted: $note")
+    }
+}
+
+
+suspend fun deleteNotes(notes: List<NotesModel>, notesModelDao: NotesModelDao) {
+    withContext(Dispatchers.IO) {
+        notes.forEach { note ->
+            notesModelDao.deleteNote(note)
+            Log.d("MainActivity", "Note deleted: $note")
+        }
+    }
+}
+suspend fun getAllNotes(notesModelDao: NotesModelDao): List<NotesModel> {
+    return withContext(Dispatchers.IO) {
+        val notes = notesModelDao.getAllNotes()
+        Log.d("MainActivity", "Retrieved notes: $notes")
+        notes
+    }
+}

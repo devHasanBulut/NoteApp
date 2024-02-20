@@ -24,33 +24,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.time.Duration.Companion.days
 
 @Composable
 fun Date(
-    dayName: String,
-    day: Byte,
-    month: String,
+    dateModel: DateModel,
     modifier: Modifier = Modifier
 ) {
+    dateModel.date = System.currentTimeMillis()
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = dateModel.date
+
+    val dayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.SHORT,Locale.getDefault())
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+    val month = calendar.getDisplayName(Calendar.MONTH,Calendar.SHORT, Locale.getDefault())
+
+    calendar.add(Calendar.MONTH, 1)
+
     Row(
         modifier = modifier
             .wrapContentSize()
     ) {
         Card(
             modifier = modifier
-                .width(55.dp)
+                .width(60.dp)
                 .height(80.dp)
                 .padding(start = 15.dp)
 
         ) {
-            Text(
-                text = dayName,
-                modifier = modifier
-                    .padding(3.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
             Text(
                 text = day.toString(),
                 modifier = modifier
@@ -58,7 +62,13 @@ fun Date(
                     .align(Alignment.CenterHorizontally)
             )
             Text(
-                text = month,
+                text = dayName!!,
+                modifier = modifier
+                    .padding(3.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Text(
+                text = month!!,
                 modifier = modifier
                     .padding(3.dp)
                     .align(Alignment.CenterHorizontally)
@@ -67,13 +77,19 @@ fun Date(
     }
 }
 @Composable
-fun AllDate(dateModelDao: DateModelDao) {
+fun AllDate(notesModelDao: NotesModelDao) {
     var dayList by remember {
         mutableStateOf(emptyList<DateModel>())
     }
-    LaunchedEffect(dateModelDao){
-        dayList = getAllDate(dateModelDao)
+    LaunchedEffect(notesModelDao){
+        if (dayList.isEmpty()){
+            dayList = getAllDate(notesModelDao)
+        }
     }
+
+val uniqueDayList = remember(dayList){
+    dayList.distinctBy { it.date.days }
+}
 
     LazyRow(
         modifier = Modifier
@@ -83,34 +99,19 @@ fun AllDate(dateModelDao: DateModelDao) {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
 
     ) {
-        items(dayList) { item ->
-            Date(item.dayName, item.day, item.month)
+        item{
+            uniqueDayList.forEach(){ dateModel ->
+                Date(dateModel = dateModel)
+
+            }
         }
 
     }
 
 }
-
-
-suspend fun insertDate(date: DateModel, dateModelDao: DateModelDao) {
-    withContext(Dispatchers.IO) {
-        dateModelDao.insertDate(date)
-        Log.d("MainActivity", "Note inserted: $date")
-    }
-}
-
-
-suspend fun deleteDate(date: List<DateModel>, dateModelDao: DateModelDao) {
-    withContext(Dispatchers.IO) {
-        date.forEach { date ->
-            dateModelDao.deleteDate(date)
-            Log.d("MainActivity", "Note deleted: $date")
-        }
-    }
-}
-suspend fun getAllDate(dateModelDao: DateModelDao): List<DateModel> {
+suspend fun getAllDate(notesModelDao: NotesModelDao): List<DateModel> {
     return withContext(Dispatchers.IO) {
-        val date = getAllDate(dateModelDao)
+        val date = notesModelDao.getAllDate()
         Log.d("MainActivity", "Retrieved notes: $date")
         date
     }

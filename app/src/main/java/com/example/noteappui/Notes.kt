@@ -1,6 +1,7 @@
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.util.Log
-import android.widget.Button
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,14 +34,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.noteappui.CategoryModel
-import com.example.noteappui.CategoryModelDao
+import com.example.noteappui.DateModel
+import com.example.noteappui.MainActivity
 import com.example.noteappui.NotesModel
 import com.example.noteappui.NotesModelDao
-import com.example.noteappui.insertCategory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -68,37 +70,45 @@ fun AllNotes(
     ) {
 
         items(noteList) { notesModel ->
-            Notes(notesModel = notesModel)
+            Notes(notesModel = notesModel, notesModelDao)
 
         }
 
     }
 
 }
+
 @Composable
 fun Notes(
     notesModel: NotesModel,
+    notesModelDao: NotesModelDao,
     modifier: Modifier = Modifier
 ) {
+    var changeTitle by remember {
+        mutableStateOf(notesModel.title)
+    }
+    var changeDescription by remember{
+        mutableStateOf(notesModel.description)
+    }
+//    var changeTitle by remember { mutableStateOf("") }
+//    var changeDescription by remember { mutableStateOf("") }
+
     Card(modifier = modifier.wrapContentSize()) {
         Column(
             modifier = modifier
                 .wrapContentSize()
 
         ) {
-            Text(
-                text = notesModel.title,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                modifier = modifier
-                    .padding(start = 15.dp, top = 10.dp)
+            TextField(value = changeTitle, onValueChange = {changeTitle = it},
+                textStyle = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                ),
             )
-
-            Text(
-                text = notesModel.description,
-                modifier = modifier
-                    .padding(start = 20.dp, top = 7.dp, bottom = 15.dp)
-            )
+            TextField(value = changeDescription, onValueChange = {changeDescription = it},
+                modifier = Modifier
+                    .padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
+                )
 
         }
 
@@ -106,11 +116,13 @@ fun Notes(
 
 }
 
+//uniqValues SQL
+
 @Composable
-fun BasicButton(notesModelDao: NotesModelDao, categoryModelDao: CategoryModelDao) {
+fun BasicButton(notesModelDao: NotesModelDao, notesModel: NotesModel) {
     var buttonClicked by remember { mutableStateOf(false) }
     if (buttonClicked) {
-        ButtonTest(notesModelDao, categoryModelDao) {
+        ButtonTest(notesModelDao, notesModel) {
             buttonClicked = false
         }
     } else {
@@ -141,7 +153,7 @@ fun BasicButton(notesModelDao: NotesModelDao, categoryModelDao: CategoryModelDao
 
 @Suppress("UNUSED_EXPRESSION")
 @Composable
-fun ButtonTest(notesModelDao: NotesModelDao,categoryModelDao: CategoryModelDao, pressBack: () -> Unit) {
+fun ButtonTest(notesModelDao: NotesModelDao, notesModel: NotesModel, pressBack: () -> Unit) {
 
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -168,7 +180,7 @@ fun ButtonTest(notesModelDao: NotesModelDao,categoryModelDao: CategoryModelDao, 
                 placeholder = {
                     Text(text = "Title..")
                 },
-                )
+            )
         }
         Card(
             modifier = Modifier
@@ -181,7 +193,7 @@ fun ButtonTest(notesModelDao: NotesModelDao,categoryModelDao: CategoryModelDao, 
                 value = description,
                 onValueChange = {
                     description = it
-                   },
+                },
                 placeholder = {
                     Text(text = "Description..")
                 },
@@ -190,13 +202,18 @@ fun ButtonTest(notesModelDao: NotesModelDao,categoryModelDao: CategoryModelDao, 
 
         }
 
-        Button(onClick = {buttonClicked = true }) {
+        Button(onClick = { buttonClicked = true }) {
             Text("Save")
 
         }
-        if (buttonClicked){
-            OnClick(notesModel = NotesModel(title = title, description = description, categoryModel = CategoryModel(categoryName = title)), notesModelDao, CategoryModel(categoryName = title), categoryModelDao)
+        if (buttonClicked) {
+            OnClick(
+                notesModel = NotesModel(title = title, description = description, category = title),
+                notesModelDao,
+                categoryModel = CategoryModel(category = title),
+                dateModel = DateModel(date = System.currentTimeMillis())
 
+            )
 
         }
 
@@ -211,12 +228,35 @@ fun ButtonTest(notesModelDao: NotesModelDao,categoryModelDao: CategoryModelDao, 
     }
 }
 
+
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun OnClick(notesModel: NotesModel, notesModelDao: NotesModelDao, categoryModel: CategoryModel,categoryModelDao: CategoryModelDao) {
+fun OnClick(
+    notesModel: NotesModel,
+    notesModelDao: NotesModelDao,
+    categoryModel: CategoryModel,
+    dateModel: DateModel
+) {
     CoroutineScope(Dispatchers.IO).launch {
         insertNote(notesModel, notesModelDao)
-        insertCategory(categoryModel, categoryModelDao)
+
+    }
+}
+
+@SuppressLint("CoroutineCreationDuringComposition")
+@Composable
+fun UpdateNotes(
+    notesModel: NotesModel,
+    notesModelDao: NotesModelDao
+){
+    CoroutineScope(Dispatchers.IO).launch {
+        updateNote(notesModel,notesModelDao)
+    }
+}
+suspend fun updateNote(note: NotesModel, notesModelDao: NotesModelDao){
+    withContext(Dispatchers.IO){
+        notesModelDao.updateNote(note)
+        Log.d("Main Activity", "Note updated: $note")
     }
 }
 
@@ -229,7 +269,6 @@ suspend fun insertNote(note: NotesModel, notesModelDao: NotesModelDao) {
     }
 }
 
-
 suspend fun deleteNotes(notes: List<NotesModel>, notesModelDao: NotesModelDao) {
     withContext(Dispatchers.IO) {
         notes.forEach { note ->
@@ -238,6 +277,7 @@ suspend fun deleteNotes(notes: List<NotesModel>, notesModelDao: NotesModelDao) {
         }
     }
 }
+
 suspend fun getAllNotes(notesModelDao: NotesModelDao): List<NotesModel> {
     return withContext(Dispatchers.IO) {
         val notes = notesModelDao.getAllNotes()

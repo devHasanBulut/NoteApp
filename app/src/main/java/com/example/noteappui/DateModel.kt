@@ -2,12 +2,9 @@ package com.example.noteappui
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.Calendar
 
-@Entity(tableName = "date")
+@Entity
 data class DateModel(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val dayName: String,
-    val day: Byte,
-    val month: String,
+    var date : Long
 )

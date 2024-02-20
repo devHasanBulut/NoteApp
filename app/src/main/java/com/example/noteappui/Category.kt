@@ -22,6 +22,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.junit.experimental.categories.Category
 
 
 @Composable
@@ -37,7 +38,7 @@ fun Category(
 
     ) {
         Text(
-            text = categoryModel.categoryName,
+            text = categoryModel.category,
             modifier = modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(start = 10.dp, end = 10.dp, top = 3.dp)
@@ -48,14 +49,14 @@ fun Category(
 
 @Composable
 fun AllCategory(
-    categoryModelDao: CategoryModelDao
+    notesModelDao: NotesModelDao
 ) {
 
     var categoryList by remember {
         mutableStateOf(emptyList<CategoryModel>())
     }
-    LaunchedEffect(categoryModelDao){
-        categoryList = getAllCategory(categoryModelDao)
+    LaunchedEffect(notesModelDao){
+        categoryList = getAllCategory(notesModelDao)
     }
 
     LazyRow(
@@ -66,33 +67,18 @@ fun AllCategory(
 
     ) {
         item {
-            categoryList.forEach { categoryModel ->
-                Category(categoryModel = categoryModel)
+            categoryList.forEach { notesModel ->
+                Category(categoryModel = notesModel)
 
             }
         }
 
     }
 }
-suspend fun getAllCategory(categoryModelDao: CategoryModelDao): List<CategoryModel> {
+suspend fun getAllCategory(notesModelDao: NotesModelDao): List<CategoryModel> {
     return withContext(Dispatchers.IO) {
-        val category = categoryModelDao.getAllCategory()
+        val category = notesModelDao.getAllCategory()
         Log.d("MainActivity", "Retrieved notes: $category")
         category
-    }
-}
-suspend fun insertCategory(category: CategoryModel, categoryModelDao: CategoryModelDao) {
-    withContext(Dispatchers.IO) {
-        categoryModelDao.insertCategory(category)
-        Log.d("MainActivity", "Note inserted: $category")
-    }
-}
-
-suspend fun deleteCategory(category: List<CategoryModel>,categoryModelDao: CategoryModelDao) {
-    withContext(Dispatchers.IO) {
-        category.forEach { category ->
-            categoryModelDao.deleteCategory(category)
-            Log.d("MainActivity", "Note deleted: $category")
-        }
     }
 }

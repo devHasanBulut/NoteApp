@@ -34,7 +34,7 @@ fun Date(
     dateModel: DateModel,
     modifier: Modifier = Modifier
 ) {
-    dateModel.date = System.currentTimeMillis()
+
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = dateModel.date
 

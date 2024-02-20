@@ -34,10 +34,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.example.noteappui.CategoryModel
 import com.example.noteappui.DateModel
 import com.example.noteappui.MainActivity
@@ -201,8 +204,14 @@ fun ButtonTest(notesModelDao: NotesModelDao, notesModel: NotesModel, pressBack: 
 
 
         }
+        val context = LocalContext.current
 
-        Button(onClick = { buttonClicked = true }) {
+        Button(onClick = { buttonClicked = true
+            val intent = Intent(context,MainActivity::class.java)
+            context.startActivity(intent)
+
+
+        }) {
             Text("Save")
 
         }
@@ -222,6 +231,7 @@ fun ButtonTest(notesModelDao: NotesModelDao, notesModel: NotesModel, pressBack: 
             modifier = Modifier
                 .size(40.dp)
         ) {
+
             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "back button")
         }
 
@@ -237,6 +247,7 @@ fun OnClick(
     categoryModel: CategoryModel,
     dateModel: DateModel
 ) {
+
     CoroutineScope(Dispatchers.IO).launch {
         insertNote(notesModel, notesModelDao)
 

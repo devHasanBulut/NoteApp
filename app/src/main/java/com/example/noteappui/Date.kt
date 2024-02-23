@@ -34,15 +34,15 @@ fun Date(
     dateModel: DateModel,
     modifier: Modifier = Modifier
 ) {
-
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = dateModel.date
+
 
     val dayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.SHORT,Locale.getDefault())
     val day = calendar.get(Calendar.DAY_OF_MONTH)
     val month = calendar.getDisplayName(Calendar.MONTH,Calendar.SHORT, Locale.getDefault())
 
-    calendar.add(Calendar.MONTH, 1)
+    //calendar.add(Calendar.MONTH, 1)
 
     Row(
         modifier = modifier
@@ -88,7 +88,7 @@ fun AllDate(notesModelDao: NotesModelDao) {
     }
 
 val uniqueDayList = remember(dayList){
-    dayList.distinctBy { it.date.days }
+    dayList.distinctBy {dateModel -> dateModel}
 }
 
     LazyRow(

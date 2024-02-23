@@ -1,5 +1,4 @@
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.background
@@ -39,8 +38,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import com.example.noteappui.CategoryModel
 import com.example.noteappui.DateModel
 import com.example.noteappui.MainActivity
@@ -50,6 +47,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 
 @Composable
 fun AllNotes(
@@ -90,7 +88,7 @@ fun Notes(
     var changeTitle by remember {
         mutableStateOf(notesModel.title)
     }
-    var changeDescription by remember{
+    var changeDescription by remember {
         mutableStateOf(notesModel.description)
     }
 //    var changeTitle by remember { mutableStateOf("") }
@@ -102,16 +100,18 @@ fun Notes(
                 .wrapContentSize()
 
         ) {
-            TextField(value = changeTitle, onValueChange = {changeTitle = it},
+            TextField(
+                value = changeTitle, onValueChange = { changeTitle = it },
                 textStyle = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                 ),
             )
-            TextField(value = changeDescription, onValueChange = {changeDescription = it},
+            TextField(
+                value = changeDescription, onValueChange = { changeDescription = it },
                 modifier = Modifier
                     .padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
-                )
+            )
 
         }
 
@@ -206,8 +206,9 @@ fun ButtonTest(notesModelDao: NotesModelDao, notesModel: NotesModel, pressBack: 
         }
         val context = LocalContext.current
 
-        Button(onClick = { buttonClicked = true
-            val intent = Intent(context,MainActivity::class.java)
+        Button(onClick = {
+            buttonClicked = true
+            val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
 
 
@@ -220,7 +221,7 @@ fun ButtonTest(notesModelDao: NotesModelDao, notesModel: NotesModel, pressBack: 
                 notesModel = NotesModel(title = title, description = description, category = title),
                 notesModelDao,
                 categoryModel = CategoryModel(category = title),
-                dateModel = DateModel(date = System.currentTimeMillis())
+                dateModel = DateModel(date = Calendar.getInstance().timeInMillis)
 
             )
 
@@ -249,7 +250,7 @@ fun OnClick(
 ) {
 
     CoroutineScope(Dispatchers.IO).launch {
-        insertNote(notesModel, notesModelDao)
+        insertNote(notesModel, notesModelDao, dateModel)
 
     }
 }
@@ -259,21 +260,21 @@ fun OnClick(
 fun UpdateNotes(
     notesModel: NotesModel,
     notesModelDao: NotesModelDao
-){
+) {
     CoroutineScope(Dispatchers.IO).launch {
-        updateNote(notesModel,notesModelDao)
+        updateNote(notesModel, notesModelDao)
     }
 }
-suspend fun updateNote(note: NotesModel, notesModelDao: NotesModelDao){
-    withContext(Dispatchers.IO){
+
+suspend fun updateNote(note: NotesModel, notesModelDao: NotesModelDao) {
+    withContext(Dispatchers.IO) {
         notesModelDao.updateNote(note)
         Log.d("Main Activity", "Note updated: $note")
     }
 }
 
 
-
-suspend fun insertNote(note: NotesModel, notesModelDao: NotesModelDao) {
+suspend fun insertNote(note: NotesModel, notesModelDao: NotesModelDao, dateModel: DateModel) {
     withContext(Dispatchers.IO) {
         notesModelDao.insertNote(note)
         Log.d("MainActivity", "Note inserted: $note")

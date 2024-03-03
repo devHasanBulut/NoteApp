@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,10 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import kotlin.time.Duration.Companion.days
 
 @Composable
 fun Date(
@@ -38,9 +35,10 @@ fun Date(
     calendar.timeInMillis = dateModel.date
 
 
-    val dayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.SHORT,Locale.getDefault())
+    val dayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault())
     val day = calendar.get(Calendar.DAY_OF_MONTH)
-    val month = calendar.getDisplayName(Calendar.MONTH,Calendar.SHORT, Locale.getDefault())
+    val month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+
 
     //calendar.add(Calendar.MONTH, 1)
 
@@ -76,20 +74,24 @@ fun Date(
         }
     }
 }
+
+
 @Composable
 fun AllDate(notesModelDao: NotesModelDao) {
+
     var dayList by remember {
         mutableStateOf(emptyList<DateModel>())
     }
-    LaunchedEffect(notesModelDao){
-        if (dayList.isEmpty()){
+
+    LaunchedEffect(notesModelDao) {
+        if (dayList.isEmpty()) {
             dayList = getAllDate(notesModelDao)
         }
     }
 
-val uniqueDayList = remember(dayList){
-    dayList.distinctBy {dateModel -> dateModel}
-}
+    val uniqueDayList = remember(dayList) {
+        dayList.distinctBy { it.date }
+    }
 
     LazyRow(
         modifier = Modifier
@@ -99,41 +101,31 @@ val uniqueDayList = remember(dayList){
         horizontalArrangement = Arrangement.spacedBy(8.dp)
 
     ) {
-        item{
-            uniqueDayList.forEach(){ dateModel ->
-                Date(dateModel = dateModel)
 
+
+        item {
+            uniqueDayList.forEach { dateModel ->
+                Date(dateModel = dateModel)
             }
         }
 
     }
-
 }
+
 suspend fun getAllDate(notesModelDao: NotesModelDao): List<DateModel> {
     return withContext(Dispatchers.IO) {
-        val date = notesModelDao.getAllDate()
+        val date = notesModelDao.getAllDate().map { dateModel ->
+            val cal = Calendar.getInstance().apply {
+                timeInMillis = dateModel.date
+            }
+            DateModel(
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)
+            )
+        }
         Log.d("MainActivity", "Retrieved notes: $date")
         date
     }
 }
 
-//fun getMockDayList(): List<DateModel> {
-//    val currentCalendar = Calendar.getInstance()
-//    val dateModelList = mutableListOf<DateModel>()
-//
-//    for (i in 0..7) {
-////        val days = arrayOf("SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY")
-////        val dayName = days.get(Calendar.DAY_OF_WEEK-1)
-//        val dayName = currentCalendar.getDisplayName(
-//            Calendar.DAY_OF_WEEK,
-//            Calendar.SHORT,
-//            Locale.getDefault()
-//        )
-//        val day = currentCalendar.get(Calendar.DAY_OF_MONTH)
-//        val month =
-//            currentCalendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
-//        dateModelList.add(DateModel(dayName, day.toByte(), month!!))
-//        currentCalendar.add(Calendar.DAY_OF_YEAR, 1)
-//    }
-//    return dateModelList
-//}

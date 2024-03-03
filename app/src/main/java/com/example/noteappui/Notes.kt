@@ -119,8 +119,6 @@ fun Notes(
 
 }
 
-//uniqValues SQL
-
 @Composable
 fun BasicButton(notesModelDao: NotesModelDao, notesModel: NotesModel) {
     var buttonClicked by remember { mutableStateOf(false) }

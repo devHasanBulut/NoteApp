@@ -11,10 +11,10 @@ import androidx.room.Update
 interface NotesModelDao {
 
     @Query("SELECT * FROM notes")
-     fun getAllNotes(): List<NotesModel>
+    fun getAllNotes(): List<NotesModel>
 
     @Insert
-     fun insertNote(notesModel: NotesModel)
+    fun insertNote(notesModel: NotesModel)
 
     @Delete
     fun deleteNote(notesModel: NotesModel)

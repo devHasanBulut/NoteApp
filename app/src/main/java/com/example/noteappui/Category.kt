@@ -1,14 +1,21 @@
 package com.example.noteappui
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,20 +30,23 @@ import androidx.room.PrimaryKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.junit.experimental.categories.Category
+import java.time.format.TextStyle
 
 
 @Composable
 fun Category(
     categoryModel: CategoryModel,
+
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .wrapContentWidth()
             .height(27.dp)
-            .padding(end = 5.dp)
+            .padding(end = 5.dp),
 
     ) {
+
         Text(
             text = categoryModel.category,
             modifier = modifier

@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import com.example.noteappui.ui.theme.NoteAppUITheme
+import java.util.Calendar
 
 
 //gradle apk yı üreten şey.

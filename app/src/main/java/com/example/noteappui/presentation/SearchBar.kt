@@ -1,4 +1,4 @@
-package com.example.noteappui
+package com.example.noteappui.presentation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Row
@@ -10,35 +10,29 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(){
+fun MainScreen(
+    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()
+){
     Row(
         modifier = Modifier.wrapContentSize()
     ) {
-        var text by remember { mutableStateOf("") }
-        var active by remember { mutableStateOf(false) }
-
 
         SearchBar(
-            query = text,
+            query = mainActivityViewModel.text,
             onQueryChange = {
-                text = it
-
+                mainActivityViewModel.onQueryChange(it)
             } ,
             onSearch = {
-                active = false
+                mainActivityViewModel.onSearch()
             },
-            active = active,
+            active = mainActivityViewModel.active,
             onActiveChange = {
-                active = it
+                mainActivityViewModel.onActiveChange(false)
             },
             placeholder = {
                 Text(text = "Search for notes..")

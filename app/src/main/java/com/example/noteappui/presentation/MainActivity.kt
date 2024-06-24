@@ -1,4 +1,4 @@
-package com.example.noteappui
+package com.example.noteappui.presentation
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -6,41 +6,28 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.ViewModelProvider
+import com.example.noteappui.Dependencies
+import com.example.noteappui.R
+import com.example.noteappui.data.AppDatabase
+import com.example.noteappui.data.NotesModel
+import com.example.noteappui.data.NotesModelDao
 import com.example.noteappui.ui.theme.NoteAppUITheme
 
 
 //gradle apk yı üreten şey.
 
 class MainActivity : ComponentActivity() {
-
-    private lateinit var notesModelDao: NotesModelDao
-
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint("CoroutineCreationDuringComposition", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-
-        val database = AppDatabase.getInstance(applicationContext)
-        notesModelDao = database.notesModelDao()
-
-
+        Dependencies.init(this)
         setContent {
-
-
-//            val navController = rememberNavController()
-//            NavHost(navController = navController, startDestination = "target screen"){
-//                composable("target screen"){
-//                    val receivedData = it.arguments?.getString("data")
-//
-//                }
-
-            //          }
-            val initialNotesModel = NotesModel(title = "", description = "", category = "")
             window.statusBarColor = getColor(R.color.black)
             NoteAppUITheme {
-                MainMenu(notesModelDao, initialNotesModel)
+                MainMenu(mainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java))
 
             }
         }

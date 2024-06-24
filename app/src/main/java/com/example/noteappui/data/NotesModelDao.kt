@@ -1,4 +1,4 @@
-package com.example.noteappui
+package com.example.noteappui.data
 
 import androidx.room.Dao
 import androidx.room.Delete

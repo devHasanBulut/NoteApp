@@ -1,18 +1,14 @@
-package com.example.noteappui
+package com.example.noteappui.presentation
 
-import AllNotes
-import BasicButton
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-
 
 
 @Composable
-fun MainMenu(notesModelDao: NotesModelDao,notesModel: NotesModel,modifier: Modifier = Modifier) {
+fun MainMenu(modifier: Modifier = Modifier, mainActivityViewModel: MainActivityViewModel) {
 
 
     Column(
@@ -23,11 +19,11 @@ fun MainMenu(notesModelDao: NotesModelDao,notesModel: NotesModel,modifier: Modif
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        BasicButton(notesModelDao, notesModel )
-        MainScreen()
-        AllDate(notesModelDao = notesModelDao)
-        AllCategory(notesModelDao)
-        AllNotes(notesModelDao = notesModelDao)
+//        BasicButton(notesModelDao, notesModel,)
+        MainScreen(mainActivityViewModel = mainActivityViewModel)
+        AllDate(mainActivityViewModel = mainActivityViewModel)
+  //      AllCategory(notesModelDao)
+   //     AllNotes(notesModelDao = notesModelDao,)
 
     }
 }

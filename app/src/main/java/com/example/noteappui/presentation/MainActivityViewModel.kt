@@ -6,40 +6,72 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteappui.Dependencies.notesModelDao
-import com.example.noteappui.data.CategoryModel
+import com.example.noteappui.domain.GetCategoryViewEntityUseCase
 import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MainActivityViewModel : ViewModel(){
+class MainActivityViewModel : ViewModel() {
+
     var dayList by mutableStateOf(emptyList<DateViewEntity>())
 
+    var noteList by mutableStateOf(emptyList<NoteViewEntity>())
+
+     var categoryList by mutableStateOf(emptyList<CategoryViewEntity>())
 
     var text by mutableStateOf("")
         private set
     var active by mutableStateOf(false)
         private set
 
-    var changeTitle by mutableStateOf("Title")
 
-    var buttonClicked by mutableStateOf(false)
+    var buttonClicked by mutableStateOf(false) // for button click
+
 
     var title by mutableStateOf("")
-
     var description by mutableStateOf("")
 
-    var changeDescription by mutableStateOf("description")
-
-    var noteList by mutableStateOf(emptyList<NoteViewEntity>())
 
 
-    var categoryList by mutableStateOf(emptyList<CategoryModel>())
 
     fun provideNoteList() {
         viewModelScope.launch(Dispatchers.IO) {
             notesModelDao?.let {
-                noteList = GetNotesViewEntityUseCase(it).execute()
+                noteList = GetNotesViewEntityUseCase(it).execute()!!
+
+
+            }
+        }
+    }
+
+    fun provideCategoryList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            notesModelDao?.let {
+                categoryList = GetCategoryViewEntityUseCase(it).execute()!!
+            }
+        }
+    }
+
+    fun updateNoteTitle(noteId: Int, newTitle: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            val note = notesModelDao?.getNoteById(noteId)
+            note?.let {
+                it.title = newTitle
+                notesModelDao?.updateNoteTitle(it)
+                title = newTitle
+            }
+
+        }
+    }
+
+    fun updateNoteDescription(noteId: Int, newDescription: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            val note = notesModelDao?.getNoteById(noteId)
+            note?.let {
+                it.description = newDescription
+                notesModelDao?.updateNoteDescription(it)
+                description = newDescription
             }
         }
     }
@@ -48,7 +80,7 @@ class MainActivityViewModel : ViewModel(){
     fun provideDayList() {
         viewModelScope.launch(Dispatchers.IO) {
             notesModelDao?.let {
-                dayList = GetDateViewEntityUseCase(it).execute()
+                dayList = GetDateViewEntityUseCase(it).execute()!!
             }
         }
     }
@@ -65,15 +97,6 @@ class MainActivityViewModel : ViewModel(){
     fun onActiveChange(isActive: Boolean) {
         active = isActive
     }
-
-    fun onButtonClicked() {
-        buttonClicked = true
-    }
-
-
-
-
-
 }
 
 

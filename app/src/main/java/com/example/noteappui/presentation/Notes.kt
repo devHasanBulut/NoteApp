@@ -28,6 +28,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -39,15 +43,15 @@ import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun AllNotes(
-    mainActivityViewModel: MainActivityViewModel, modifier: Modifier = Modifier
+    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(), modifier: Modifier = Modifier
 ) {
     LaunchedEffect(true) {
         mainActivityViewModel.provideNoteList()
     }
-
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = modifier
@@ -58,9 +62,8 @@ fun AllNotes(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
 
-        items(mainActivityViewModel.noteList) { notesModel ->
-            Notes(notesViewEntity = notesModel)
-
+        items(mainActivityViewModel.noteList) { note ->
+            Notes(notesViewEntity = note)
         }
 
     }
@@ -71,6 +74,7 @@ fun AllNotes(
 fun Notes(
     notesViewEntity: NoteViewEntity,
     modifier: Modifier = Modifier,
+    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()
 ) {
 
     Card(modifier = modifier.wrapContentSize()) {
@@ -79,7 +83,12 @@ fun Notes(
 
         ) {
             TextField(
-                value = notesViewEntity.title, onValueChange = { notesViewEntity.title = it },
+                value = notesViewEntity.title,
+                onValueChange = { newTitle ->
+                    notesViewEntity.title = newTitle
+                    mainActivityViewModel.updateNoteTitle(notesViewEntity.id, newTitle)
+                                },
+
                 textStyle = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
@@ -87,7 +96,10 @@ fun Notes(
             )
             TextField(
                 value = notesViewEntity.description,
-                onValueChange = { notesViewEntity.description = it },
+                onValueChange = { newDescription ->
+                    mainActivityViewModel.updateNoteDescription(notesViewEntity.id, newDescription)
+                },
+
                 modifier = Modifier.padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
             )
 
@@ -141,7 +153,7 @@ fun ButtonTest(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Magenta)
+            .background(Color.Blue)
     ) {
         Card(
             modifier = Modifier
@@ -166,7 +178,7 @@ fun ButtonTest(
                 .wrapContentHeight()
                 .padding(top = 30.dp)
         ) {
-            //description
+
             TextField(
                 value = mainActivityViewModel.description,
                 onValueChange = {
@@ -214,10 +226,13 @@ fun ButtonTest(
 fun OnClick(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),onClick: Unit) {
     CoroutineScope(Dispatchers.IO).launch {
         mainActivityViewModel.provideNoteList()
+        withContext(Dispatchers.Main) {
+            mainActivityViewModel.buttonClicked = false
+        }
     }
 }
 
 
 data class NoteViewEntity(
-    var title: String, var description: String, val category: String, val date: String
+    val id: Int = 0,var title: String, var description: String, val category: String, val date: String,
 )

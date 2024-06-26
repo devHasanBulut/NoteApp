@@ -12,18 +12,17 @@ fun MainMenu(modifier: Modifier = Modifier, mainActivityViewModel: MainActivityV
 
 
     Column(
-        modifier = modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
 
         //verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-//        BasicButton(notesModelDao, notesModel,)
+        BasicButton()
         MainScreen(mainActivityViewModel = mainActivityViewModel)
         AllDate(mainActivityViewModel = mainActivityViewModel)
-  //      AllCategory(notesModelDao)
-   //     AllNotes(notesModelDao = notesModelDao,)
+        AllCategory()
+        AllNotes()
 
     }
 }

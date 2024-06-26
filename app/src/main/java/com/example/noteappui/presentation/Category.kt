@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +27,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun Category(
-    categoryModel: CategoryModel,
+    categoryViewEntity: CategoryViewEntity,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -37,7 +38,7 @@ fun Category(
 
     ) {
         Text(
-            text = categoryModel.category,
+            text = categoryViewEntity.category,
             modifier = modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(start = 10.dp, end = 10.dp, top = 3.dp)
@@ -46,16 +47,14 @@ fun Category(
     }
 }
 
+
 @Composable
 fun AllCategory(
-    notesModelDao: NotesModelDao
-) {
+    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
 
-    var categoryList by remember {
-        mutableStateOf(emptyList<CategoryModel>())
-    }
-    LaunchedEffect(notesModelDao){
-        categoryList = getAllCategory(notesModelDao)
+) {
+    LaunchedEffect(true){
+        mainActivityViewModel.provideCategoryList()
     }
 
     LazyRow(
@@ -65,19 +64,15 @@ fun AllCategory(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
 
     ) {
-        item {
-            categoryList.forEach { notesModel ->
-                Category(categoryModel = notesModel)
+        items(mainActivityViewModel.categoryList) { category ->
+            Category(categoryViewEntity = category)
 
             }
         }
 
     }
-}
-suspend fun getAllCategory(notesModelDao: NotesModelDao): List<CategoryModel> {
-    return withContext(Dispatchers.IO) {
-        val category = notesModelDao.getAllCategory()
-        Log.d("MainActivity", "Retrieved notes: $category")
-        category
-    }
-}
+
+
+data class CategoryViewEntity(
+    val category: String
+)

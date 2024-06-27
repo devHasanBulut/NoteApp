@@ -3,9 +3,12 @@ package com.example.noteappui.presentation
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.noteappui.Dependencies.notesModelDao
+import com.example.noteappui.data.NotesModel
 import com.example.noteappui.domain.GetCategoryViewEntityUseCase
 import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
@@ -13,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel : ViewModel() {
+
 
     var dayList by mutableStateOf(emptyList<DateViewEntity>())
 
@@ -26,13 +30,12 @@ class MainActivityViewModel : ViewModel() {
         private set
 
 
-    var buttonClicked by mutableStateOf(false) // for button click
+    var buttonClicked by mutableStateOf(false)
 
 
     var title by mutableStateOf("")
+
     var description by mutableStateOf("")
-
-
 
 
     fun provideNoteList() {
@@ -44,6 +47,23 @@ class MainActivityViewModel : ViewModel() {
             }
         }
     }
+
+    fun insertNote() {
+        viewModelScope.launch(Dispatchers.IO) {
+            notesModelDao?.let {
+                it.insertNote(
+                    NotesModel(
+                        title = title,
+                        description = description
+                    )
+
+                )
+
+            }
+            provideNoteList()
+        }
+    }
+
 
     fun provideCategoryList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -98,5 +118,10 @@ class MainActivityViewModel : ViewModel() {
         active = isActive
     }
 }
+
+
+//insert note ekle, ui not kısmında onValueChange ile title ve description değişikliklerini alıp update et
+//ekran yan çevrildiğinde veriler gitmeyecek
+
 
 

@@ -103,4 +103,5 @@ private fun Date(
 
 data class DateViewEntity(
     val dayName: String, val day: Int, val month: String
-)
+) {
+}

@@ -39,6 +39,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +53,7 @@ fun AllNotes(
     LaunchedEffect(true) {
         mainActivityViewModel.provideNoteList()
     }
+
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = modifier
@@ -86,7 +88,6 @@ fun Notes(
                 value = notesViewEntity.title,
                 onValueChange = { newTitle ->
                     notesViewEntity.title = newTitle
-                    mainActivityViewModel.updateNoteTitle(notesViewEntity.id, newTitle)
                                 },
 
                 textStyle = TextStyle(
@@ -97,7 +98,7 @@ fun Notes(
             TextField(
                 value = notesViewEntity.description,
                 onValueChange = { newDescription ->
-                    mainActivityViewModel.updateNoteDescription(notesViewEntity.id, newDescription)
+                    notesViewEntity.description = newDescription
                 },
 
                 modifier = Modifier.padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
@@ -195,6 +196,7 @@ fun ButtonTest(
 
         Button(onClick = {
             mainActivityViewModel.buttonClicked = true
+            mainActivityViewModel.provideNoteList()
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
 
@@ -220,14 +222,15 @@ fun ButtonTest(
     }
 }
 
-
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun OnClick(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),onClick: Unit) {
     CoroutineScope(Dispatchers.IO).launch {
         mainActivityViewModel.provideNoteList()
+        mainActivityViewModel.insertNote()
         withContext(Dispatchers.Main) {
             mainActivityViewModel.buttonClicked = false
+
         }
     }
 }

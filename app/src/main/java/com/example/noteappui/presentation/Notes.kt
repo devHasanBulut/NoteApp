@@ -54,6 +54,10 @@ fun AllNotes(
         mainActivityViewModel.provideNoteList()
     }
 
+    val showNotes = mainActivityViewModel.selectedCategory?.let{
+        mainActivityViewModel.getNotesByCategory(it)
+    }?:mainActivityViewModel.noteList
+
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = modifier

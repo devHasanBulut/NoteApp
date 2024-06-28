@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel : ViewModel() {
+    var selectedCategory by mutableStateOf<String?>(null)
 
 
     var dayList by mutableStateOf(emptyList<DateViewEntity>())
@@ -36,6 +37,14 @@ class MainActivityViewModel : ViewModel() {
     var title by mutableStateOf("")
 
     var description by mutableStateOf("")
+
+
+
+    fun getNotesByCategory(category : String) : List<NoteViewEntity>{
+    return noteList.filter { it.category == category }
+
+}
+
 
 
     fun provideNoteList() {

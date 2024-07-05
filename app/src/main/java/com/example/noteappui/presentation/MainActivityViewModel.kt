@@ -1,29 +1,38 @@
 package com.example.noteappui.presentation
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.noteappui.Dependencies.notesModelDao
-import com.example.noteappui.data.NotesModel
 import com.example.noteappui.domain.GetCategoryViewEntityUseCase
 import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
+import com.example.noteappui.domain.InsertNote
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel : ViewModel() {
-    var selectedCategory by mutableStateOf<String?>(null)
-
 
     var dayList by mutableStateOf(emptyList<DateViewEntity>())
 
     var noteList by mutableStateOf(emptyList<NoteViewEntity>())
 
-     var categoryList by mutableStateOf(emptyList<CategoryViewEntity>())
+    var categoryList by mutableStateOf(emptyList<CategoryViewEntity>())
+
+    private val _noteList = mutableStateListOf<NoteViewEntity>()
+    val noteList1: List<NoteViewEntity> get() = _noteList
+
+    fun updateTitle(id: Int, newTitle: String) {
+        _noteList.firstOrNull { it.id == id }?.title = newTitle
+    }
+
+    fun updateDescription(id: Int, newDescription: String) {
+        _noteList.firstOrNull { it.id == id }?.description = newDescription
+    }
+
 
     var text by mutableStateOf("")
         private set
@@ -33,18 +42,11 @@ class MainActivityViewModel : ViewModel() {
 
     var buttonClicked by mutableStateOf(false)
 
+    var dateClicked by mutableStateOf(false)
 
     var title by mutableStateOf("")
 
     var description by mutableStateOf("")
-
-
-
-    fun getNotesByCategory(category : String) : List<NoteViewEntity>{
-    return noteList.filter { it.category == category }
-
-}
-
 
 
     fun provideNoteList() {
@@ -57,18 +59,16 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun insertNote() {
+    private var insertNoteUseCase = InsertNote()
+
+    fun addNewNote() {
         viewModelScope.launch(Dispatchers.IO) {
-            notesModelDao?.let {
-                it.insertNote(
-                    NotesModel(
-                        title = title,
-                        description = description
-                    )
-
-                )
-
-            }
+            insertNoteUseCase.addNewNote(
+                title = title,
+                description = description,
+                category = title,
+                date = System.currentTimeMillis()
+            )
             provideNoteList()
         }
     }
@@ -79,22 +79,24 @@ class MainActivityViewModel : ViewModel() {
             notesModelDao?.let {
                 categoryList = GetCategoryViewEntityUseCase(it).execute()!!
             }
+
         }
     }
 
-    fun updateNoteTitle(noteId: Int, newTitle: String){
+    fun updateNoteTitle(noteId: Int, newTitle: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val note = notesModelDao?.getNoteById(noteId)
             note?.let {
                 it.title = newTitle
                 notesModelDao?.updateNoteTitle(it)
                 title = newTitle
+
             }
 
         }
     }
 
-    fun updateNoteDescription(noteId: Int, newDescription: String){
+    fun updateNoteDescription(noteId: Int, newDescription: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val note = notesModelDao?.getNoteById(noteId)
             note?.let {
@@ -108,10 +110,13 @@ class MainActivityViewModel : ViewModel() {
 
     fun provideDayList() {
         viewModelScope.launch(Dispatchers.IO) {
-            notesModelDao?.let {
-                dayList = GetDateViewEntityUseCase(it).execute()!!
-            }
+            dayList = GetDateViewEntityUseCase().execute()!!
+
         }
+    }
+
+    fun onValueChangeTitle(value: String){
+        title = value
     }
 
     fun onQueryChange(query: String) {
@@ -127,10 +132,4 @@ class MainActivityViewModel : ViewModel() {
         active = isActive
     }
 }
-
-
-//insert note ekle, ui not kısmında onValueChange ile title ve description değişikliklerini alıp update et
-//ekran yan çevrildiğinde veriler gitmeyecek
-
-
 

@@ -39,8 +39,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,15 +46,13 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun AllNotes(
-    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(), modifier: Modifier = Modifier
+    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
+    modifier: Modifier = Modifier
 ) {
     LaunchedEffect(true) {
         mainActivityViewModel.provideNoteList()
-    }
 
-    val showNotes = mainActivityViewModel.selectedCategory?.let{
-        mainActivityViewModel.getNotesByCategory(it)
-    }?:mainActivityViewModel.noteList
+    }
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
@@ -82,6 +78,7 @@ fun Notes(
     modifier: Modifier = Modifier,
     mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()
 ) {
+    var changeTitle by remember{ mutableStateOf(notesViewEntity.title) }
 
     Card(modifier = modifier.wrapContentSize()) {
         Column(
@@ -89,9 +86,9 @@ fun Notes(
 
         ) {
             TextField(
-                value = notesViewEntity.title,
-                onValueChange = { newTitle ->
-                    notesViewEntity.title = newTitle
+                value = changeTitle,
+                onValueChange = {
+                                changeTitle = it
                                 },
 
                 textStyle = TextStyle(
@@ -103,6 +100,7 @@ fun Notes(
                 value = notesViewEntity.description,
                 onValueChange = { newDescription ->
                     notesViewEntity.description = newDescription
+
                 },
 
                 modifier = Modifier.padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
@@ -121,7 +119,7 @@ fun BasicButton(
 ) {
 
     if (mainActivityViewModel.buttonClicked) {
-        ButtonTest() {
+        ButtonTest {
             mainActivityViewModel.buttonClicked = false
         }
     } else {
@@ -199,6 +197,7 @@ fun ButtonTest(
         val context = LocalContext.current
 
         Button(onClick = {
+            mainActivityViewModel.addNewNote()
             mainActivityViewModel.buttonClicked = true
             mainActivityViewModel.provideNoteList()
             val intent = Intent(context, MainActivity::class.java)
@@ -211,8 +210,9 @@ fun ButtonTest(
         }
         if (mainActivityViewModel.buttonClicked) {
             OnClick(
-                onClick = Unit
-            )
+                onClick = Unit,
+
+                )
 
         }
 
@@ -228,10 +228,9 @@ fun ButtonTest(
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun OnClick(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),onClick: Unit) {
+fun OnClick(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(), onClick: Unit) {
     CoroutineScope(Dispatchers.IO).launch {
         mainActivityViewModel.provideNoteList()
-        mainActivityViewModel.insertNote()
         withContext(Dispatchers.Main) {
             mainActivityViewModel.buttonClicked = false
 
@@ -240,6 +239,12 @@ fun OnClick(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel
 }
 
 
+
+
 data class NoteViewEntity(
-    val id: Int = 0,var title: String, var description: String, val category: String, val date: String,
+    val id: Int = 0,
+    var title: String,
+    var description: String,
+    val category: String,
+    val date: String,
 )

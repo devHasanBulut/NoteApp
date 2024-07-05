@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(
+fun SearchBar(
     mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()
 ){
     Row(

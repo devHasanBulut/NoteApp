@@ -1,6 +1,5 @@
 package com.example.noteappui.presentation
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -10,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -21,8 +19,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Category(
     categoryViewEntity: CategoryViewEntity,
-    modifier: Modifier = Modifier,
-    clickItem: (String) -> Unit
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
@@ -36,11 +33,8 @@ fun Category(
             modifier = modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(start = 10.dp, end = 10.dp, top = 3.dp)
-                .clickable {
-                    clickItem(categoryViewEntity.category)
-                }
-        )
 
+        )
     }
 }
 
@@ -48,9 +42,8 @@ fun Category(
 @Composable
 fun AllCategory(
     mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
-
 ) {
-    LaunchedEffect(true){
+    LaunchedEffect(true) {
         mainActivityViewModel.provideCategoryList()
     }
 
@@ -62,16 +55,16 @@ fun AllCategory(
 
     ) {
         items(mainActivityViewModel.categoryList) { category ->
-            Category(categoryViewEntity = category){
-                mainActivityViewModel.selectedCategory = it
-            }
+            Category(categoryViewEntity = category)
 
-            }
         }
-
     }
+
+}
 
 
 data class CategoryViewEntity(
     val category: String
 )
+
+

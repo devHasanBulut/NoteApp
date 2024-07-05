@@ -12,13 +12,13 @@ import com.example.noteappui.presentation.NoteViewEntity
 interface NotesModelDao {
 
     @Query("SELECT * FROM notes")
-     fun getAllNotes(): List<NotesModel>
+    fun getAllNotes(): List<NotesModel>
 
-     @Query("SELECT * FROM notes WHERE id = :noteId")
-     fun getNoteById(noteId: Int): NotesModel?
+    @Query("SELECT * FROM notes WHERE id = :noteId")
+    fun getNoteById(noteId: Int): NotesModel?
 
     @Insert
-     fun insertNote(notesModel: NotesModel)
+    fun insertNote(notesModel: NotesModel)
 
     @Delete
     fun deleteNote(notesModel: NotesModel)

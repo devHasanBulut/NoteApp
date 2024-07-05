@@ -18,13 +18,11 @@ fun MainMenu(modifier: Modifier = Modifier, mainActivityViewModel: MainActivityV
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        BasicButton()
-        MainScreen(mainActivityViewModel = mainActivityViewModel)
+        BasicButton(mainActivityViewModel = mainActivityViewModel)
+        SearchBar(mainActivityViewModel = mainActivityViewModel)
         AllDate(mainActivityViewModel = mainActivityViewModel)
-        AllCategory()
-        AllNotes()
+        AllCategory(mainActivityViewModel = mainActivityViewModel)
+        AllNotes(mainActivityViewModel = mainActivityViewModel)
 
     }
 }
-
-

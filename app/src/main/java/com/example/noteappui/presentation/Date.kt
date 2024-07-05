@@ -1,7 +1,10 @@
 package com.example.noteappui.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -66,7 +69,8 @@ private fun AllDatePreview(
 private fun Date(
     dateViewEntity: DateViewEntity = DateViewEntity(
         dayName = "Mon", day = 1, month = "Jan"
-    ), modifier: Modifier = Modifier
+    ), modifier: Modifier = Modifier,
+
 ) {
 
     Row(
@@ -78,8 +82,11 @@ private fun Date(
                 .height(80.dp)
                 .padding(start = 15.dp)
 
+
         ) {
+
             Text(
+
                 text = dateViewEntity.day.toString(),
                 modifier = modifier
                     .padding(3.dp)
@@ -101,7 +108,10 @@ private fun Date(
     }
 }
 
+
+
+
+
 data class DateViewEntity(
     val dayName: String, val day: Int, val month: String
-) {
-}
+)

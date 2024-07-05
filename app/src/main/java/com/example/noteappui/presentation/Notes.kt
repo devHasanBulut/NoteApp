@@ -93,6 +93,7 @@ fun Notes(
                 value = changeTitle,
                 onValueChange = {
                                 changeTitle = it
+                    mainActivityViewModel.updateNoteTitle(notesViewEntity.id, changeTitle)
                                 },
 
                 textStyle = TextStyle(
@@ -104,6 +105,7 @@ fun Notes(
                 value = changeDescription,
                 onValueChange = {
                     changeDescription = it
+                    mainActivityViewModel.updateNoteDescription(notesViewEntity.id, changeDescription)
 
                 },
 

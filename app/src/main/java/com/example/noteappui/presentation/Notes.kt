@@ -80,6 +80,10 @@ fun Notes(
 ) {
     var changeTitle by remember{ mutableStateOf(notesViewEntity.title) }
 
+    var changeDescription by remember{
+        mutableStateOf(notesViewEntity.description)
+    }
+
     Card(modifier = modifier.wrapContentSize()) {
         Column(
             modifier = modifier.wrapContentSize()
@@ -97,9 +101,9 @@ fun Notes(
                 ),
             )
             TextField(
-                value = notesViewEntity.description,
-                onValueChange = { newDescription ->
-                    notesViewEntity.description = newDescription
+                value = changeDescription,
+                onValueChange = {
+                    changeDescription = it
 
                 },
 

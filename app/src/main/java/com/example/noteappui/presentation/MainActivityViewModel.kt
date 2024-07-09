@@ -1,7 +1,6 @@
 package com.example.noteappui.presentation
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -22,23 +21,11 @@ class MainActivityViewModel : ViewModel() {
 
     var categoryList by mutableStateOf(emptyList<CategoryViewEntity>())
 
-    private val _noteList = mutableStateListOf<NoteViewEntity>()
-    val noteList1: List<NoteViewEntity> get() = _noteList
-
-    fun updateTitle(id: Int, newTitle: String) {
-        _noteList.firstOrNull { it.id == id }?.title = newTitle
-    }
-
-    fun updateDescription(id: Int, newDescription: String) {
-        _noteList.firstOrNull { it.id == id }?.description = newDescription
-    }
-
 
     var text by mutableStateOf("")
         private set
     var active by mutableStateOf(false)
         private set
-
 
     var buttonClicked by mutableStateOf(false)
 
@@ -54,10 +41,10 @@ class MainActivityViewModel : ViewModel() {
             notesModelDao?.let {
                 noteList = GetNotesViewEntityUseCase(it).execute()!!
 
-
             }
         }
     }
+
 
     private var insertNoteUseCase = InsertNote()
 
@@ -72,6 +59,7 @@ class MainActivityViewModel : ViewModel() {
             provideNoteList()
         }
     }
+
 
 
     fun provideCategoryList() {
@@ -115,7 +103,7 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun onValueChangeTitle(value: String){
+    fun onValueChangeTitle(value: String) {
         title = value
     }
 

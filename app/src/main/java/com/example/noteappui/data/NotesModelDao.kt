@@ -14,6 +14,9 @@ interface NotesModelDao {
     @Query("SELECT * FROM notes")
     fun getAllNotes(): List<NotesModel>
 
+    @Query("SELECT * FROM notes WHERE category = :noteCategory")
+    fun getNotesByCategory(noteCategory: String): NotesModel?
+
     @Query("SELECT * FROM notes WHERE id = :noteId")
     fun getNoteById(noteId: Int): NotesModel?
 

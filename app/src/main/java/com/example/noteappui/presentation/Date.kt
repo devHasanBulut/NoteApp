@@ -1,6 +1,7 @@
 package com.example.noteappui.presentation
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -9,7 +10,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,10 +29,19 @@ fun AllDate(mainActivityViewModel: MainActivityViewModel) {
     LaunchedEffect(true) {
         mainActivityViewModel.provideDayList()
     }
-    AllDatePreview(mainActivityViewModel.dayList)
-}
+    val dayList by remember {
+        mainActivityViewModel.dayList }
 
-@Preview
+    var selectedDate by remember { mutableStateOf<DateViewEntity?>(null) }
+
+    AllDatePreview(dayList = dayList) { dateModel ->
+        selectedDate = dateModel
+    }
+
+    selectedDate?.let { date ->
+        DateDetails(dateViewEntity = date)
+    }
+}
 @Composable
 private fun AllDatePreview(
     dayList: List<DateViewEntity> = listOf(
@@ -36,10 +49,11 @@ private fun AllDatePreview(
         DateViewEntity(dayName = "Tue", day = 2, month = "Feb"),
         DateViewEntity(dayName = "Wed", day = 3, month = "Mar"),
         DateViewEntity(dayName = "Thu", day = 4, month = "Apr"),
-    )
+    ),
+    onItemClick: (DateViewEntity) -> Unit = {}
 ) {
     val uniqueDayList = remember(dayList) {
-        dayList.distinctBy { dateModel -> dateModel }
+        dayList.distinctBy { it }
     }
 
     LazyRow(
@@ -48,29 +62,25 @@ private fun AllDatePreview(
             .wrapContentHeight()
             .padding(top = 15.dp, start = 15.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
-
     ) {
-        item {
-            uniqueDayList.forEach { dateModel ->
-                Date(dateViewEntity = dateModel)
-
-            }
+        items(uniqueDayList) { dateModel ->
+            Date(
+                dateViewEntity = dateModel,
+                onClick = { onItemClick(dateModel) }
+            )
         }
-
     }
-
 }
 
-@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Date(
     dateViewEntity: DateViewEntity = DateViewEntity(
         dayName = "Mon", day = 1, month = "Jan"
     ),
     modifier: Modifier = Modifier,
-
-    ) {
-
+    onClick: () -> Unit = {}
+) {
     Row(
         modifier = modifier.wrapContentSize()
     ) {
@@ -84,7 +94,6 @@ private fun Date(
         ) {
 
             Text(
-
                 text = dateViewEntity.day.toString(),
                 modifier = modifier
                     .padding(3.dp)
@@ -105,6 +114,20 @@ private fun Date(
         }
     }
 }
+@Composable
+fun DateDetails(dateViewEntity: DateViewEntity) {
+
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Text(
+            text = "Date: ${dateViewEntity.dayName}, ${dateViewEntity.day} ${dateViewEntity.month}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+    }
+}
+
 
 
 data class DateViewEntity(

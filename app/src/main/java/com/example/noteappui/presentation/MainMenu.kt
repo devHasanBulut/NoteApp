@@ -20,7 +20,7 @@ fun MainMenu(modifier: Modifier = Modifier, mainActivityViewModel: MainActivityV
     ) {
         BasicButton(mainActivityViewModel = mainActivityViewModel)
         SearchBar(mainActivityViewModel = mainActivityViewModel)
-        AllDate(mainActivityViewModel = mainActivityViewModel)
+        AllDate(mainActivityViewModel = mainActivityViewModel, )
         AllCategory(mainActivityViewModel = mainActivityViewModel)
         AllNotes(mainActivityViewModel = mainActivityViewModel)
 

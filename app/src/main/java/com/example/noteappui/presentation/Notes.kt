@@ -171,7 +171,6 @@ fun ButtonTest(
                 .padding(top = 20.dp)
         ) {
             TextField(
-                //title
                 value = mainActivityViewModel.title,
                 onValueChange = {
                     mainActivityViewModel.title = it

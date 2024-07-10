@@ -5,7 +5,6 @@ import com.example.noteappui.data.NotesModelDao
 import com.example.noteappui.presentation.DateViewEntity
 import java.util.Calendar
 import java.util.Locale
-//
 
 class GetDateViewEntityUseCase(
     private val notesModelDao: NotesModelDao? = Dependencies.notesModelDao

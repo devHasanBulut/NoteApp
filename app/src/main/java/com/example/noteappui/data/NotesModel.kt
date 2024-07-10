@@ -11,6 +11,6 @@ data class NotesModel(
     val id: Int = 0,
     var title: String,
     var description: String,
-    val category: String = title,
+    var category: String = title,
     val date: Long = Calendar.getInstance().timeInMillis
 )

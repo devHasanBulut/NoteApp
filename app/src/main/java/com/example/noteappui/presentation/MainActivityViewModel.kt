@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class MainActivityViewModel : ViewModel() {
 
-    var dayList by mutableStateOf(emptyList<DateViewEntity>())
+     var dayList by mutableStateOf(emptyList<DateViewEntity>())
 
     var noteList by mutableStateOf(emptyList<NoteViewEntity>())
 
@@ -29,11 +29,15 @@ class MainActivityViewModel : ViewModel() {
 
     var buttonClicked by mutableStateOf(false)
 
-    var dateClicked by mutableStateOf(false)
-
     var title by mutableStateOf("")
 
     var description by mutableStateOf("")
+
+    var dateClicked by mutableStateOf(false)
+
+    fun onDateClicked(clicked: Boolean){
+        dateClicked = clicked
+    }
 
 
     fun provideNoteList() {
@@ -95,6 +99,17 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
+    fun updateNoteCategory(noteId: Int, newCategory: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            val note = notesModelDao?.getNoteById(noteId)
+            note?.let {
+                it.category = newCategory
+                notesModelDao?.updateNoteCategory(it)
+            }
+        }
+
+    }
+
 
     fun provideDayList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -102,6 +117,8 @@ class MainActivityViewModel : ViewModel() {
 
         }
     }
+
+
 
     fun onValueChangeTitle(value: String) {
         title = value

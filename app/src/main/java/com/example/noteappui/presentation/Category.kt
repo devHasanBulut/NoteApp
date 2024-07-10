@@ -75,36 +75,9 @@ fun AllCategory(
             }
 
         }
-//        items(mainActivityViewModel.categoryList) { category ->
-//            Category(categoryViewEntity = category)
-//
-//        }
+
     }
-    selectedCategory?.let { category ->
-        AlertDialog(
-            onDismissRequest = { selectedCategory = null },
-            title = { Text(text = "Category: ${category.category}") },
-            confirmButton = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    mainActivityViewModel.noteList.forEach { note ->
-                        Text(text = note.description)
-                    }
 
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { selectedCategory = null }) {
-                    Text(text = "Back")
-
-                }
-            },
-
-
-            )
-    }
 
 }
 

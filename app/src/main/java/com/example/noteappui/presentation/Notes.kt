@@ -51,6 +51,7 @@ fun AllNotes(
 ) {
     LaunchedEffect(true) {
         mainActivityViewModel.provideNoteList()
+        //
 
     }
 

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.noteappui.repository.UserScreen
 import com.example.noteappui.repository.writeNewUser
 
 @Composable
@@ -17,11 +18,12 @@ fun MainMenu(
         // verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        BasicButton(mainActivityViewModel = mainActivityViewModel)
-        SearchBar(mainActivityViewModel = mainActivityViewModel)
-        AllDate(mainActivityViewModel = mainActivityViewModel)
-        AllCategory(mainActivityViewModel = mainActivityViewModel)
-        AllNotes(mainActivityViewModel = mainActivityViewModel)
-        writeNewUser("", "asf", "asf")
+            /*BasicButton(mainActivityViewModel = mainActivityViewModel)
+            SearchBar(mainActivityViewModel = mainActivityViewModel)
+            AllDate(mainActivityViewModel = mainActivityViewModel)
+            AllCategory(mainActivityViewModel = mainActivityViewModel)
+            AllNotes(mainActivityViewModel = mainActivityViewModel)
+             */
+        UserScreen()
     }
 }

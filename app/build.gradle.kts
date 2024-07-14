@@ -54,6 +54,8 @@ android {
 }
 
 dependencies {
+    implementation ("com.google.firebase:firebase-database-ktx:20.0.5")
+    implementation ("androidx.compose.runtime:runtime-livedata:1.4.0")
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")

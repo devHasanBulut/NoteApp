@@ -1,46 +1,60 @@
 package com.example.noteappui.repository
-
-import android.content.ContentValues.TAG
-import android.util.Log
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
-import com.google.firebase.database.getValue
 
+
+val pathName = "user"
 val database = Firebase.database.reference
-
-val postListener = object : ValueEventListener{
-    override fun onDataChange(snapshot: DataSnapshot) {
-        val post = snapshot.getValue<User>()
-
-    }
-
-    override fun onCancelled(databaseError: DatabaseError) {
-        Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-    }
-
-}
-
-
-
 
 @IgnoreExtraProperties
 data class User(
-    val username: String? = null,
-    val email: String? = null,
+    val username: String = "",
+    val email: String = ""
 )
 
-fun writeNewUser(
-    userId: String,
-    name: String,
-    email: String,
-) {
-    val user = User(name, email)
+fun writeNewUser() {
+    val newUser = User("hasan", "hasanbulut@")
 
-    database.child("users").child(userId).setValue(user)
-
-
+    database.child(pathName).setValue(newUser)
 }
+
+@Composable
+fun UserScreen() {
+    val database = Firebase.database.reference
+    var user by remember { mutableStateOf<User?>(null) }
+
+    LaunchedEffect(Unit) {
+        database.child("user").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                user = snapshot.getValue(User::class.java)
+            }
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+    user?.let { user ->
+        Column {
+            Text(text = "Username: ${user.username}")
+            Text(text = "Email: ${user.email}")
+        }
+    } ?: run {
+        Text(text = "No user data available")
+    }
+}
+
+
+

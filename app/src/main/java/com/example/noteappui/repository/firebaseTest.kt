@@ -1,60 +1,65 @@
 package com.example.noteappui.repository
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.MutableLiveData
-import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
 
+private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
+val pathName = "notes"
 
-val pathName = "user"
-val database = Firebase.database.reference
+class InsertNoteFb {
+    fun execute(newNote: NotesModelForFirebase) {
+        insertNoteFb(newNote)
+    }
 
-@IgnoreExtraProperties
-data class User(
-    val username: String = "",
-    val email: String = ""
-)
+    fun addNewNote(
+        title: String,
+        description: String,
+        category: String,
+        date: Long,
+    ) {
+        val newNote =
+            NotesModelForFirebase(
+                title = title,
+                description = description,
+                category = category,
+                date = date,
+            )
+        execute(newNote)
+    }
+}
 
-fun writeNewUser() {
-    val newUser = User("hasan", "hasanbulut@")
-
-    database.child(pathName).setValue(newUser)
+fun insertNoteFb(notesModel: NotesModelForFirebase) {
+    val noteId = database.child(pathName).push().key
+    noteId?.let {
+        database.child(pathName).child(it).setValue(notesModel)
+    }
 }
 
 @Composable
-fun UserScreen() {
-    val database = Firebase.database.reference
-    var user by remember { mutableStateOf<User?>(null) }
-
-    LaunchedEffect(Unit) {
-        database.child("user").addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                user = snapshot.getValue(User::class.java)
-            }
-            override fun onCancelled(error: DatabaseError) {
-            }
-        })
+fun getNotesFromFirebase() {
+    var testNote by remember {
+        mutableStateOf<NotesModelForFirebase?>(null)
     }
-    user?.let { user ->
-        Column {
-            Text(text = "Username: ${user.username}")
-            Text(text = "Email: ${user.email}")
-        }
-    } ?: run {
-        Text(text = "No user data available")
+    LaunchedEffect(Unit) {
+        database.child(pathName).addListenerForSingleValueEvent(
+            object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    testNote = snapshot.getValue(NotesModelForFirebase::class.java)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            },
+        )
     }
 }
-
-
-

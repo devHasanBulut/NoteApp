@@ -205,6 +205,7 @@ fun ButtonTest(
 
         Button(onClick = {
             mainActivityViewModel.addNewNote()
+            mainActivityViewModel.addNewNoteForFb()
             mainActivityViewModel.buttonClicked = true
             mainActivityViewModel.provideNoteList()
             val intent = Intent(context, MainActivity::class.java)

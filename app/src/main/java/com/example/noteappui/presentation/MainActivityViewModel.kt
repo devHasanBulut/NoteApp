@@ -10,6 +10,7 @@ import com.example.noteappui.domain.GetCategoryViewEntityUseCase
 import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import com.example.noteappui.domain.InsertNote
+import com.example.noteappui.repository.InsertNoteFb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -51,6 +52,17 @@ class MainActivityViewModel : ViewModel() {
 
 
     private var insertNoteUseCase = InsertNote()
+    private var insertNoteUseCaseFb = InsertNoteFb()
+    fun addNewNoteForFb(){
+        viewModelScope.launch(Dispatchers.IO) {
+            insertNoteUseCaseFb.addNewNote(
+                title = title,
+                description = description,
+                category = title,
+                date = System.currentTimeMillis()
+            )
+        }
+    }
 
     fun addNewNote() {
         viewModelScope.launch(Dispatchers.IO) {

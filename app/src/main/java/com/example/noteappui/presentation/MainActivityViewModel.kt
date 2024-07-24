@@ -11,17 +11,16 @@ import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import com.example.noteappui.domain.InsertNote
 import com.example.noteappui.repository.InsertNoteFb
+import com.example.noteappui.repository.ReadNotesFirebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel : ViewModel() {
-
-     var dayList by mutableStateOf(emptyList<DateViewEntity>())
+    var dayList by mutableStateOf(emptyList<DateViewEntity>())
 
     var noteList by mutableStateOf(emptyList<NoteViewEntity>())
 
     var categoryList by mutableStateOf(emptyList<CategoryViewEntity>())
-
 
     var text by mutableStateOf("")
         private set
@@ -36,30 +35,47 @@ class MainActivityViewModel : ViewModel() {
 
     var dateClicked by mutableStateOf(false)
 
-    fun onDateClicked(clicked: Boolean){
+    private var getNotesFromFirebase = ReadNotesFirebase()
+
+    var noteListFirebase by mutableStateOf(emptyList<NoteViewEntity>())
+
+    fun onDateClicked(clicked: Boolean) {
         dateClicked = clicked
     }
 
+    fun provideNoteListForFirebase() {
+        getNotesFromFirebase.readNotesFirebase { firebaseNotes ->
+            noteListFirebase =
+                firebaseNotes.map {
+                    NoteViewEntity(
+                        id = 0,
+                        title = it.title,
+                        description = it.description,
+                        category = it.category,
+                        date = it.date.toString(),
+                    )
+                }
+        }
+    }
 
     fun provideNoteList() {
         viewModelScope.launch(Dispatchers.IO) {
             notesModelDao?.let {
                 noteList = GetNotesViewEntityUseCase(it).execute()!!
-
             }
         }
     }
 
-
     private var insertNoteUseCase = InsertNote()
     private var insertNoteUseCaseFb = InsertNoteFb()
-    fun addNewNoteForFb(){
+
+    fun addNewNoteForFb() {
         viewModelScope.launch(Dispatchers.IO) {
             insertNoteUseCaseFb.addNewNote(
                 title = title,
                 description = description,
                 category = title,
-                date = System.currentTimeMillis()
+                date = System.currentTimeMillis(),
             )
         }
     }
@@ -70,37 +86,38 @@ class MainActivityViewModel : ViewModel() {
                 title = title,
                 description = description,
                 category = title,
-                date = System.currentTimeMillis()
+                date = System.currentTimeMillis(),
             )
             provideNoteList()
         }
     }
-
-
 
     fun provideCategoryList() {
         viewModelScope.launch(Dispatchers.IO) {
             notesModelDao?.let {
                 categoryList = GetCategoryViewEntityUseCase(it).execute()!!
             }
-
         }
     }
 
-    fun updateNoteTitle(noteId: Int, newTitle: String) {
+    fun updateNoteTitle(
+        noteId: Int,
+        newTitle: String,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             val note = notesModelDao?.getNoteById(noteId)
             note?.let {
                 it.title = newTitle
                 notesModelDao?.updateNoteTitle(it)
                 title = newTitle
-
             }
-
         }
     }
 
-    fun updateNoteDescription(noteId: Int, newDescription: String) {
+    fun updateNoteDescription(
+        noteId: Int,
+        newDescription: String,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             val note = notesModelDao?.getNoteById(noteId)
             note?.let {
@@ -111,7 +128,10 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun updateNoteCategory(noteId: Int, newCategory: String){
+    fun updateNoteCategory(
+        noteId: Int,
+        newCategory: String,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             val note = notesModelDao?.getNoteById(noteId)
             note?.let {
@@ -119,18 +139,13 @@ class MainActivityViewModel : ViewModel() {
                 notesModelDao?.updateNoteCategory(it)
             }
         }
-
     }
-
 
     fun provideDayList() {
         viewModelScope.launch(Dispatchers.IO) {
             dayList = GetDateViewEntityUseCase().execute()!!
-
         }
     }
-
-
 
     fun onValueChangeTitle(value: String) {
         title = value
@@ -149,4 +164,3 @@ class MainActivityViewModel : ViewModel() {
         active = isActive
     }
 }
-

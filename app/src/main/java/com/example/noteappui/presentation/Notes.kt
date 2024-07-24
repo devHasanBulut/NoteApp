@@ -18,8 +18,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -47,108 +47,94 @@ import kotlinx.coroutines.withContext
 @Composable
 fun AllNotes(
     mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     LaunchedEffect(true) {
-        mainActivityViewModel.provideNoteList()
+        mainActivityViewModel.provideNoteListForFirebase()
         //
-
     }
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
-        modifier = modifier
-            .wrapContentSize()
-            .padding(top = 25.dp),
+        modifier =
+            modifier
+                .wrapContentSize()
+                .padding(top = 25.dp),
         contentPadding = PaddingValues(16.dp),
         verticalItemSpacing = 16.dp,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-
-        items(mainActivityViewModel.noteList) { note ->
+        items(mainActivityViewModel.noteListFirebase) { note ->
             Notes(notesViewEntity = note)
         }
-
     }
-
 }
 
 @Composable
 fun Notes(
     notesViewEntity: NoteViewEntity,
     modifier: Modifier = Modifier,
-    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()
+    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
 ) {
-    var changeTitle by remember{ mutableStateOf(notesViewEntity.title) }
+    var changeTitle by remember { mutableStateOf(notesViewEntity.title) }
 
-    var changeDescription by remember{
+    var changeDescription by remember {
         mutableStateOf(notesViewEntity.description)
     }
 
     Card(modifier = modifier.wrapContentSize()) {
         Column(
-            modifier = modifier.wrapContentSize()
-
+            modifier = modifier.wrapContentSize(),
         ) {
             TextField(
                 value = changeTitle,
                 onValueChange = {
-                                changeTitle = it
+                    changeTitle = it
                     mainActivityViewModel.updateNoteTitle(notesViewEntity.id, it)
                     mainActivityViewModel.updateNoteCategory(notesViewEntity.id, it)
-                                },
-
-                textStyle = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                ),
+                },
+                textStyle =
+                    TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                    ),
             )
             TextField(
                 value = changeDescription,
                 onValueChange = {
                     changeDescription = it
                     mainActivityViewModel.updateNoteDescription(notesViewEntity.id, it)
-
                 },
-
                 modifier = Modifier.padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
             )
-
         }
-
     }
-
-
 }
 
 @Composable
-fun BasicButton(
-    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()
-) {
-
+fun BasicButton(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()) {
     if (mainActivityViewModel.buttonClicked) {
         ButtonTest {
             mainActivityViewModel.buttonClicked = false
         }
     } else {
         Column(
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
-
             Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .weight(1f, false)
+                modifier =
+                    Modifier
+                        .verticalScroll(rememberScrollState())
+                        .weight(1f, false),
             ) {}
 
             Button(
                 onClick = {
                     mainActivityViewModel.buttonClicked = true
-                }, modifier = Modifier.padding(end = 2.dp)
-
+                },
+                modifier = Modifier.padding(end = 2.dp),
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "add button")
-
             }
         }
     }
@@ -158,19 +144,20 @@ fun BasicButton(
 @Composable
 fun ButtonTest(
     mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
-    pressBack: () -> Unit
+    pressBack: () -> Unit,
 ) {
-
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Blue)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.Blue),
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(top = 20.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(top = 20.dp),
         ) {
             TextField(
                 value = mainActivityViewModel.title,
@@ -183,12 +170,12 @@ fun ButtonTest(
             )
         }
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(top = 30.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(top = 30.dp),
         ) {
-
             TextField(
                 value = mainActivityViewModel.description,
                 onValueChange = {
@@ -198,8 +185,6 @@ fun ButtonTest(
                     Text(text = "Description..")
                 },
             )
-
-
         }
         val context = LocalContext.current
 
@@ -207,47 +192,40 @@ fun ButtonTest(
             mainActivityViewModel.addNewNote()
             mainActivityViewModel.addNewNoteForFb()
             mainActivityViewModel.buttonClicked = true
-            mainActivityViewModel.provideNoteList()
+            mainActivityViewModel.provideNoteListForFirebase()
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
-
-
         }) {
             Text("Save")
-
         }
         if (mainActivityViewModel.buttonClicked) {
             OnClick(
                 onClick = Unit,
-
-                )
-
+            )
         }
 
         IconButton(
-            onClick = { pressBack() }, modifier = Modifier.size(40.dp)
+            onClick = { pressBack() },
+            modifier = Modifier.size(40.dp),
         ) {
-
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "back button")
+            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back button")
         }
-
     }
 }
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun OnClick(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(), onClick: Unit) {
+fun OnClick(
+    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
+    onClick: Unit,
+) {
     CoroutineScope(Dispatchers.IO).launch {
-        mainActivityViewModel.provideNoteList()
+        mainActivityViewModel.provideNoteListForFirebase()
         withContext(Dispatchers.Main) {
             mainActivityViewModel.buttonClicked = false
-
         }
     }
 }
-
-
-
 
 data class NoteViewEntity(
     val id: Int = 0,

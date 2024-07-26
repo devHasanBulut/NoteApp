@@ -1,5 +1,6 @@
 package com.example.noteappui.presentation
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +12,8 @@ import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import com.example.noteappui.domain.InsertNote
 import com.example.noteappui.repository.InsertNoteFb
+import com.example.noteappui.repository.ReadCategoryFirebase
+import com.example.noteappui.repository.ReadDateFirebase
 import com.example.noteappui.repository.ReadNotesFirebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,12 +38,45 @@ class MainActivityViewModel : ViewModel() {
 
     var dateClicked by mutableStateOf(false)
 
+    private var getCategoryFromFirebase = ReadCategoryFirebase()
+
     private var getNotesFromFirebase = ReadNotesFirebase()
+
+    private var getDateFromFirebase = ReadDateFirebase()
 
     var noteListFirebase by mutableStateOf(emptyList<NoteViewEntity>())
 
+    var categoryListFirebase by mutableStateOf(emptyList<CategoryViewEntity>())
+
+    var dateListFirebase by mutableStateOf(emptyList<DateViewEntity?>())
+
     fun onDateClicked(clicked: Boolean) {
         dateClicked = clicked
+    }
+
+    fun provideDateListFirebase() {
+        @Suppress("ktlint:standard:multiline-expression-wrapping")
+        getDateFromFirebase.readDateFirebase { firebaseDate ->
+            dateListFirebase = firebaseDate.map {
+                DateViewEntity(
+                    dayName = it!!.dayName,
+                    day = it.day,
+                    month = it.month,
+                )
+            }
+            Log.d("FirebaseDates", "Updated dateListFirebase: $dateListFirebase")
+        }
+    }
+
+    fun provideCategoryListFirebase() {
+        getCategoryFromFirebase.readCategoryFirebase { firebaseCategory ->
+            categoryListFirebase =
+                firebaseCategory.map {
+                    CategoryViewEntity(
+                        category = it.category,
+                    )
+                }
+        }
     }
 
     fun provideNoteListForFirebase() {
@@ -55,6 +91,20 @@ class MainActivityViewModel : ViewModel() {
                         date = it.date.toString(),
                     )
                 }
+        }
+    }
+
+    fun provideDayList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            dayList = GetDateViewEntityUseCase().execute()!!
+        }
+    }
+
+    fun provideCategoryList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            notesModelDao?.let {
+                categoryList = GetCategoryViewEntityUseCase(it).execute()!!
+            }
         }
     }
 
@@ -89,14 +139,6 @@ class MainActivityViewModel : ViewModel() {
                 date = System.currentTimeMillis(),
             )
             provideNoteList()
-        }
-    }
-
-    fun provideCategoryList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            notesModelDao?.let {
-                categoryList = GetCategoryViewEntityUseCase(it).execute()!!
-            }
         }
     }
 
@@ -138,12 +180,6 @@ class MainActivityViewModel : ViewModel() {
                 it.category = newCategory
                 notesModelDao?.updateNoteCategory(it)
             }
-        }
-    }
-
-    fun provideDayList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            dayList = GetDateViewEntityUseCase().execute()!!
         }
     }
 

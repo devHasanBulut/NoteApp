@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 fun AllDate(mainActivityViewModel: MainActivityViewModel) {
     LaunchedEffect(true) {
         mainActivityViewModel.provideDateListFirebase()
-
         Log.d(
             "ALL DATE",
             "test launched effect: ${mainActivityViewModel.provideDateListFirebase()}",

@@ -90,6 +90,11 @@ fun Notes(
                 value = changeTitle,
                 onValueChange = {
                     changeTitle = it
+                    mainActivityViewModel.updateNote(
+                        noteId = notesViewEntity.id.toString(),
+                        newTitle = it,
+                        newDescription = changeDescription,
+                    )
                     mainActivityViewModel.updateNoteTitle(notesViewEntity.id, it)
                     mainActivityViewModel.updateNoteCategory(notesViewEntity.id, it)
                 },
@@ -103,6 +108,11 @@ fun Notes(
                 value = changeDescription,
                 onValueChange = {
                     changeDescription = it
+                    mainActivityViewModel.updateNote(
+                        noteId = notesViewEntity.id.toString(),
+                        newTitle = changeTitle,
+                        newDescription = it,
+                    )
                     mainActivityViewModel.updateNoteDescription(notesViewEntity.id, it)
                 },
                 modifier = Modifier.padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
@@ -208,7 +218,10 @@ fun ButtonTest(
             onClick = { pressBack() },
             modifier = Modifier.size(40.dp),
         ) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back button")
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "back button",
+            )
         }
     }
 }

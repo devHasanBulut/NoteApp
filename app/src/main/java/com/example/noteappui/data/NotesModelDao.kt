@@ -10,7 +10,6 @@ import com.example.noteappui.presentation.NoteViewEntity
 
 @Dao
 interface NotesModelDao {
-
     @Query("SELECT * FROM notes")
     fun getAllNotes(): List<NotesModel>
 

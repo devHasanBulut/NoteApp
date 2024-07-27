@@ -11,7 +11,15 @@ import java.util.Calendar
 import java.util.Locale
 
 private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
-val pathName = "notes"
+@Suppress("ktlint:standard:property-naming")
+const val pathName = "notes"
+
+fun updateNoteFirebase(
+    noteId: String,
+    updateNote: NotesModelForFirebase,
+) {
+    database.child(pathName).child(noteId).setValue(updateNote)
+}
 
 class ReadNotesFirebase {
     fun readNotesFirebase(callback: (List<NotesModelForFirebase>) -> Unit) {
@@ -19,8 +27,10 @@ class ReadNotesFirebase {
         database.child(pathName).addListenerForSingleValueEvent(
             object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    noteListFirebase.clear()
                     for (noteSnapshot in snapshot.children) {
                         val note = noteSnapshot.getValue(NotesModelForFirebase::class.java)
+
                         note?.let {
                             noteListFirebase.add(it)
                         }
@@ -68,7 +78,7 @@ class ReadDateFirebase {
                     val dateListFirebase = mutableListOf<DateViewEntity>()
                     for (dateSnapshot in snapshot.children) {
                         val date = dateSnapshot.getValue(DateModelForFirebase::class.java)
-                        val res=
+                        val res =
                             date?.let {
                                 val calendar = Calendar.getInstance()
                                 calendar.timeInMillis = it.date
@@ -98,6 +108,25 @@ class ReadDateFirebase {
                 }
             },
         )
+    }
+}
+
+class UpdateNote {
+    fun updateNote(
+        noteId: String,
+        title: String,
+        description: String,
+        category: String,
+        date: Long,
+    ) {
+        val updateNote =
+            NotesModelForFirebase(
+                title = title,
+                description = description,
+                category = category,
+                date = date,
+            )
+        updateNoteFirebase(noteId, updateNote)
     }
 }
 

@@ -15,6 +15,8 @@ import com.example.noteappui.repository.InsertNoteFb
 import com.example.noteappui.repository.ReadCategoryFirebase
 import com.example.noteappui.repository.ReadDateFirebase
 import com.example.noteappui.repository.ReadNotesFirebase
+import com.example.noteappui.repository.UpdateNote
+import com.example.noteappui.repository.updateNoteFirebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -59,7 +61,7 @@ class MainActivityViewModel : ViewModel() {
         getDateFromFirebase.readDateFirebase { firebaseDate ->
             dateListFirebase = firebaseDate.map {
                 DateViewEntity(
-                    dayName = it!!.dayName,
+                    dayName = it.dayName,
                     day = it.day,
                     month = it.month,
                 )
@@ -116,8 +118,33 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
+    private var updateNoteFirebase = UpdateNote()
     private var insertNoteUseCase = InsertNote()
     private var insertNoteUseCaseFb = InsertNoteFb()
+
+    fun updateNote(
+        noteId: String,
+        newTitle: String,
+        newDescription: String
+    ){
+        viewModelScope.launch(Dispatchers.IO) {
+            updateNoteFirebase.updateNote(
+                noteId = noteId,
+                title = newTitle,
+                description = newDescription,
+                category = newTitle,
+                date = System.currentTimeMillis()
+            )
+            noteListFirebase = noteListFirebase.map {
+                if (it.id.toString() == noteId){
+                    it.copy(title = newTitle, description = newDescription)
+                } else{
+                    it
+                }
+            }
+        }
+
+    }
 
     fun addNewNoteForFb() {
         viewModelScope.launch(Dispatchers.IO) {

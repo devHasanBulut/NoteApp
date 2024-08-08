@@ -3,7 +3,7 @@ package com.example.noteappui.domain
 import com.example.noteappui.Dependencies.notesModelDao
 import com.example.noteappui.data.NotesModel
 
-class InsertNote() {
+class InsertNote {
      fun execute(newNote: NotesModel){
         notesModelDao?.insertNote(newNote)
 

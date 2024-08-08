@@ -48,7 +48,7 @@ fun Category(
 @Composable
 fun AllCategory(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()) {
     LaunchedEffect(true) {
-        mainActivityViewModel.provideCategoryListFirebase()
+        mainActivityViewModel.getAllCategoryFromMySQL()
     }
 
     var selectedCategory: CategoryViewEntity? by remember { mutableStateOf(null) }
@@ -61,7 +61,7 @@ fun AllCategory(mainActivityViewModel: MainActivityViewModel = MainActivityViewM
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item {
-            mainActivityViewModel.categoryListFirebase.forEach { category ->
+            mainActivityViewModel.categoryListForMySql.forEach { category ->
                 Category(categoryViewEntity = category, onClick = { selectedCategory = category })
             }
         }

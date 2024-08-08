@@ -50,7 +50,7 @@ fun AllNotes(
     modifier: Modifier = Modifier,
 ) {
     LaunchedEffect(true) {
-        mainActivityViewModel.provideNoteListForFirebase()
+        mainActivityViewModel.getAllNotesFromMySQL()
         //
     }
 
@@ -64,7 +64,7 @@ fun AllNotes(
         verticalItemSpacing = 16.dp,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(mainActivityViewModel.noteListFirebase) { note ->
+        items(mainActivityViewModel.noteListForMySql) { note ->
             Notes(notesViewEntity = note)
         }
     }
@@ -90,6 +90,7 @@ fun Notes(
                 value = changeTitle,
                 onValueChange = {
                     changeTitle = it
+
                     mainActivityViewModel.updateNote(
                         noteId = notesViewEntity.id.toString(),
                         newTitle = it,
@@ -199,10 +200,11 @@ fun ButtonTest(
         val context = LocalContext.current
 
         Button(onClick = {
+            mainActivityViewModel.addNewNoteMySql()
             mainActivityViewModel.addNewNote()
             mainActivityViewModel.addNewNoteForFb()
             mainActivityViewModel.buttonClicked = true
-            mainActivityViewModel.provideNoteListForFirebase()
+            //mainActivityViewModel.provideNoteListForFirebase()
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
         }) {
@@ -233,7 +235,7 @@ fun OnClick(
     onClick: Unit,
 ) {
     CoroutineScope(Dispatchers.IO).launch {
-        mainActivityViewModel.provideNoteListForFirebase()
+        //mainActivityViewModel.provideNoteListForFirebase()
         withContext(Dispatchers.Main) {
             mainActivityViewModel.buttonClicked = false
         }

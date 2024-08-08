@@ -30,25 +30,24 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AllDate(mainActivityViewModel: MainActivityViewModel) {
     LaunchedEffect(true) {
-        mainActivityViewModel.provideDateListFirebase()
+        mainActivityViewModel.getAllDateFromMySQL()
         Log.d(
             "ALL DATE",
-            "test launched effect: ${mainActivityViewModel.provideDateListFirebase()}",
+            "test launched effect: ${mainActivityViewModel.getAllNotesFromMySQL()}",
         )
     }
-    val uniqueDayList = mainActivityViewModel.dateListFirebase.distinctBy { it }
+    val uniqueDayList = mainActivityViewModel.dateListForMySql.distinctBy { it }
     Log.d("test unique", "uniqueDayList: $uniqueDayList")
 
     LazyRow(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(top = 15.dp, start = 15.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(top = 15.dp, start = 15.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(uniqueDayList) { dateModel ->
-            Date(dateViewEntity = dateModel!!)
+            Date(dateViewEntity = dateModel)
         }
     }
 }
@@ -57,12 +56,11 @@ fun AllDate(mainActivityViewModel: MainActivityViewModel) {
 @Preview
 @Composable
 private fun Date(
-    dateViewEntity: DateViewEntity =
-        DateViewEntity(
-            dayName = "Mon",
-            day = 1,
-            month = "Jan",
-        ),
+    dateViewEntity: DateViewEntity = DateViewEntity(
+        dayName = "Mon",
+        day = 1,
+        month = "Jan",
+    ),
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     selectedDate: DateViewEntity? = null,
     onDateSelected: (DateViewEntity) -> Unit = {},
@@ -71,33 +69,29 @@ private fun Date(
         modifier = modifier.wrapContentSize(),
     ) {
         Card(
-            modifier =
-                modifier
-                    .width(60.dp)
-                    .height(80.dp)
-                    .padding(start = 15.dp)
-                    .clickable { onDateSelected(dateViewEntity) },
+            modifier = modifier
+                .width(60.dp)
+                .height(80.dp)
+                .padding(start = 15.dp)
+                .clickable { onDateSelected(dateViewEntity) },
         ) {
             Text(
                 text = dateViewEntity.day.toString(),
-                modifier =
-                    modifier
-                        .padding(3.dp)
-                        .align(Alignment.CenterHorizontally),
+                modifier = modifier
+                    .padding(3.dp)
+                    .align(Alignment.CenterHorizontally),
             )
             Text(
                 text = dateViewEntity.dayName,
-                modifier =
-                    modifier
-                        .padding(3.dp)
-                        .align(Alignment.CenterHorizontally),
+                modifier = modifier
+                    .padding(3.dp)
+                    .align(Alignment.CenterHorizontally),
             )
             Text(
                 text = dateViewEntity.month,
-                modifier =
-                    modifier
-                        .padding(3.dp)
-                        .align(Alignment.CenterHorizontally),
+                modifier = modifier
+                    .padding(3.dp)
+                    .align(Alignment.CenterHorizontally),
             )
         }
     }
@@ -108,12 +102,10 @@ private fun Date(
 fun NewColumnContent(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()) {
     if (mainActivityViewModel.dateClicked) {
         Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.Yellow),
-        ) {
-        }
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Yellow),
+        ) {}
     }
 }
 

@@ -57,6 +57,8 @@ dependencies {
     //noinspection GradleDependency
     implementation ("com.google.firebase:firebase-database-ktx:20.0.5")
     //noinspection GradleDependency
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("androidx.compose.runtime:runtime-livedata:1.4.0")
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("androidx.core:core-ktx:1.13.1")
@@ -82,6 +84,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     @Suppress("ktlint:standard:property-naming")
     val room_version = "2.4.0"
     //noinspection GradleDependency

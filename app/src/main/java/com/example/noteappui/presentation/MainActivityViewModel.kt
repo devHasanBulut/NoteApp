@@ -7,11 +7,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteappui.Dependencies.notesModelDao
-import com.example.noteappui.data.NotesModel
 import com.example.noteappui.domain.GetCategoryViewEntityUseCase
 import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import com.example.noteappui.domain.InsertNote
+import com.example.noteappui.domain.NewNoteForMySQL
 import com.example.noteappui.repository.InsertNoteFb
 import com.example.noteappui.repository.ReadCategoryFirebase
 import com.example.noteappui.repository.ReadDateFirebase
@@ -122,16 +122,19 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
+
+
     fun addNewNoteMySql() {
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val newNote = NotesModel(
+                val newNoteForMySQL = NewNoteForMySQL(
                     title = title,
                     description = description,
                     category = title,
-                    date = System.currentTimeMillis()
+                    date = System.currentTimeMillis(),
                 )
-                val response = RetrofitClient.api.createNote(newNote).execute()
+                val response = RetrofitClient.api.createNote(newNoteForMySQL.newNote).execute()
                 if (response.isSuccessful) {
                     Log.d("MainActivityViewModel", "Not başarıyla eklendi")
                     provideNoteList()

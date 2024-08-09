@@ -6,7 +6,7 @@ import com.example.noteappui.data.NotesModel
 import retrofit2.Call
 import retrofit2.http.*
 
-interface NotesApiService {
+interface NotesApiService {//
 
     @GET("notes")
     fun getAllNotes(): Call<List<NotesModel>>

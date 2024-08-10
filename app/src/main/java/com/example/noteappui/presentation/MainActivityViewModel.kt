@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteappui.Dependencies.notesModelDao
+import com.example.noteappui.data.NotesModel
 import com.example.noteappui.domain.GetCategoryViewEntityUseCase
 import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
@@ -23,6 +25,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel : ViewModel() {
+
+    private val allNotes = MutableLiveData<List<NotesModel>>()
+    init {
+        viewModelScope.launch {
+            allNotes.value = notesModelDao?.getAllNotes()
+        }
+    }
+
     var dayList by mutableStateOf(emptyList<DateViewEntity>())
 
     var noteList by mutableStateOf(emptyList<NoteViewEntity>())
@@ -153,7 +163,8 @@ class MainActivityViewModel : ViewModel() {
             try {
                 val response = RetrofitClient.api.getAllNotes().execute()
                 if (response.isSuccessful) {
-                    noteListForMySql = response.body()!!.map {
+
+                    val notesFromMySql = response.body()!!.map {
                         NoteViewEntity(
                             id = it.id,
                             title = it.title,
@@ -162,6 +173,8 @@ class MainActivityViewModel : ViewModel() {
                             date = it.date.toString()
                         )
                     }
+                    noteListForMySql = notesFromMySql
+
                 } else {
                     Log.e("MainActivityViewModel", "Hata: ${response.errorBody()?.string()}")
                 }
@@ -240,6 +253,16 @@ class MainActivityViewModel : ViewModel() {
                 date = System.currentTimeMillis()
             )
             RetrofitClient.api.updateNote(noteId, updateNoteFromMySQLObject.updateNote).execute()
+
+            val note = notesModelDao?.getNoteById(noteId)
+            note?.let {
+                it.title = newTitle
+                it.description = newDescription
+                it.category = newTitle
+                notesModelDao?.updateNoteTitle(it)
+                notesModelDao?.updateNoteDescription(it)
+                notesModelDao?.updateNoteCategory(it)
+            }
         }
     }
 

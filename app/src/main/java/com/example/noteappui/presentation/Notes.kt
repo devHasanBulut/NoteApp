@@ -90,6 +90,7 @@ fun Notes(
                 value = changeTitle,
                 onValueChange = {
                     changeTitle = it
+                    mainActivityViewModel.updateNoteForMySQl(notesViewEntity.id, it, changeDescription)
 
                     mainActivityViewModel.updateNote(
                         noteId = notesViewEntity.id.toString(),
@@ -109,6 +110,7 @@ fun Notes(
                 value = changeDescription,
                 onValueChange = {
                     changeDescription = it
+                    mainActivityViewModel.updateNoteForMySQl(notesViewEntity.id, changeTitle, it)
                     mainActivityViewModel.updateNote(
                         noteId = notesViewEntity.id.toString(),
                         newTitle = changeTitle,

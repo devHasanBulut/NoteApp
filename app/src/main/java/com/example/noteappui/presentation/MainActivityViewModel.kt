@@ -12,6 +12,7 @@ import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import com.example.noteappui.domain.InsertNote
 import com.example.noteappui.domain.NewNoteForMySQL
+import com.example.noteappui.domain.UpdateNoteFromMySQL
 import com.example.noteappui.repository.InsertNoteFb
 import com.example.noteappui.repository.ReadCategoryFirebase
 import com.example.noteappui.repository.ReadDateFirebase
@@ -225,6 +226,21 @@ class MainActivityViewModel : ViewModel() {
             Log.e("MainActivityViewModel", "Hata: ${e.message}")
         }
 
+    }
+
+    fun updateNoteForMySQl(
+        noteId: Int, newTitle: String, newDescription: String
+    ){
+        viewModelScope.launch(Dispatchers.IO){
+            val updateNoteFromMySQLObject = UpdateNoteFromMySQL(
+                noteId = noteId,
+                title = newTitle,
+                description = newDescription,
+                category = newTitle,
+                date = System.currentTimeMillis()
+            )
+            RetrofitClient.api.updateNote(noteId, updateNoteFromMySQLObject.updateNote).execute()
+        }
     }
 
 

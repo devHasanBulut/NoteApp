@@ -1,4 +1,4 @@
-package com.example.noteappui.repository
+package com.example.noteappui.data
 
 import android.util.Log
 import com.example.noteappui.presentation.DateViewEntity

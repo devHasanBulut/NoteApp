@@ -4,35 +4,28 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.noteappui.CheckNetConnect
 import com.example.noteappui.Dependencies.notesModelDao
-import com.example.noteappui.data.NotesModel
 import com.example.noteappui.domain.GetCategoryViewEntityUseCase
 import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import com.example.noteappui.domain.InsertNote
 import com.example.noteappui.domain.NewNoteForMySQL
 import com.example.noteappui.domain.UpdateNoteFromMySQL
-import com.example.noteappui.repository.InsertNoteFb
-import com.example.noteappui.repository.ReadCategoryFirebase
-import com.example.noteappui.repository.ReadDateFirebase
-import com.example.noteappui.repository.ReadNotesFirebase
-import com.example.noteappui.repository.RetrofitClient
-import com.example.noteappui.repository.UpdateNote
+import com.example.noteappui.data.InsertNoteFb
+import com.example.noteappui.data.ReadCategoryFirebase
+import com.example.noteappui.data.ReadDateFirebase
+import com.example.noteappui.data.ReadNotesFirebase
+import com.example.noteappui.data.RetrofitClient
+import com.example.noteappui.data.UpdateNote
+import com.google.api.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel : ViewModel() {
-
-    private val allNotes = MutableLiveData<List<NotesModel>>()
-    init {
-        viewModelScope.launch {
-            allNotes.value = notesModelDao?.getAllNotes()
-        }
-    }
-
     var dayList by mutableStateOf(emptyList<DateViewEntity>())
 
     var noteList by mutableStateOf(emptyList<NoteViewEntity>())
@@ -116,7 +109,6 @@ class MainActivityViewModel : ViewModel() {
             dayList = GetDateViewEntityUseCase().execute()!!
         }
     }
-    //
 
     fun provideCategoryList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -128,16 +120,13 @@ class MainActivityViewModel : ViewModel() {
 
     fun provideNoteList() {
         viewModelScope.launch(Dispatchers.IO) {
-            notesModelDao?.let {
-                noteList = GetNotesViewEntityUseCase(it).execute()!!
-            }
+            noteList = GetNotesViewEntityUseCase(notesModelDao!!).execute()!!
         }
     }
 
 
 
-    fun addNewNoteMySql() {
-
+    fun addNewNoteMySql(context: android.content.Context) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val newNoteForMySQL = NewNoteForMySQL(
@@ -146,41 +135,49 @@ class MainActivityViewModel : ViewModel() {
                     category = title,
                     date = System.currentTimeMillis(),
                 )
-                val response = RetrofitClient.api.createNote(newNoteForMySQL.newNote).execute()
-                if (response.isSuccessful) {
-                    Log.d("MainActivityViewModel", "Not başarıyla eklendi")
-                    provideNoteList()
-                } else {
-                    Log.e("MainActivityViewModel", "Hata: ${response.errorBody()?.string()}")
+
+                if (CheckNetConnect.isInternetAvailable(context)){
+                    val response = RetrofitClient.api.createNote(newNoteForMySQL.newNote).execute()
+                    if (response.isSuccessful) {
+                        Log.d("MainActivityViewModel", "Not başarıyla eklendi")
+                        provideNoteList()
+                    } else {
+                        Log.e("MainActivityViewModel", "Hata: ${response.errorBody()?.string()}")
+                    }
+                }else {
+                    newNoteForMySQL.insertNoteDb()
                 }
+
             } catch (e: Exception) {
                 Log.e("MainActivityViewModel", "Hata: ${e.message}")
             }
         }
+
     }
 
     fun getAllNotesFromMySQL() {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitClient.api.getAllNotes().execute()
-                if (response.isSuccessful) {
-
-                    val notesFromMySql = response.body()!!.map {
-                        NoteViewEntity(
-                            id = it.id,
-                            title = it.title,
-                            description = it.description,
-                            category = it.category,
-                            date = it.date.toString()
-                        )
+            if (CheckNetConnect.isInternetAvailable()) {
+                try {
+                    val response = RetrofitClient.api.getAllNotes().execute()
+                    if (response.isSuccessful) {
+                        noteListForMySql = response.body()!!.map {
+                            NoteViewEntity(
+                                id = it.id,
+                                title = it.title,
+                                description = it.description,
+                                category = it.category,
+                                date = it.date.toString()
+                            )
+                        }
+                    } else {
+                        Log.e("MainActivityViewModel", "Hata: ${response.errorBody()?.string()}")
                     }
-                    noteListForMySql = notesFromMySql
-
-                } else {
-                    Log.e("MainActivityViewModel", "Hata: ${response.errorBody()?.string()}")
+                } catch (e: Exception) {
+                    Log.e("MainActivityViewModel", "Hata: ${e.message}")
                 }
-            } catch (e: Exception) {
-                Log.e("MainActivityViewModel", "Hata: ${e.message}")
+            } else {
+                Log.e("MainActivityViewModel", "Hata: İnternet bağlantısı yok.")
             }
         }
     }
@@ -254,16 +251,6 @@ class MainActivityViewModel : ViewModel() {
                 date = System.currentTimeMillis()
             )
             RetrofitClient.api.updateNote(noteId, updateNoteFromMySQLObject.updateNote).execute()
-
-            val note = notesModelDao?.getNoteById(noteId)
-            note?.let {
-                it.title = newTitle
-                it.description = newDescription
-                it.category = newTitle
-                notesModelDao?.updateNoteTitle(it)
-                notesModelDao?.updateNoteDescription(it)
-                notesModelDao?.updateNoteCategory(it)
-            }
         }
     }
 
@@ -295,9 +282,15 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
+    fun testAddNoteWithSQL(){
+        viewModelScope.launch(Dispatchers.IO) {
+            insertNoteUseCase.addNewNoteDb()
+        }
+    }
+
     fun addNewNote() {
         viewModelScope.launch(Dispatchers.IO) {
-            insertNoteUseCase.addNewNote(
+            insertNoteUseCase.TestAddNewNote(
                 title = title,
                 description = description,
                 category = title,
@@ -365,4 +358,3 @@ class MainActivityViewModel : ViewModel() {
         active = isActive
     }
 }
-

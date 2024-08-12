@@ -50,21 +50,21 @@ fun AllNotes(
     modifier: Modifier = Modifier,
 ) {
     LaunchedEffect(true) {
-        mainActivityViewModel.getAllNotesFromMySQL()
+        mainActivityViewModel.provideNoteList()
         //
     }
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier =
-            modifier
-                .wrapContentSize()
-                .padding(top = 25.dp),
+        modifier
+            .wrapContentSize()
+            .padding(top = 25.dp),
         contentPadding = PaddingValues(16.dp),
         verticalItemSpacing = 16.dp,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(mainActivityViewModel.noteListForMySql) { note ->
+        items(mainActivityViewModel.noteList) { note ->
             Notes(notesViewEntity = note)
         }
     }
@@ -92,30 +92,20 @@ fun Notes(
                     changeTitle = it
                     mainActivityViewModel.updateNoteForMySQl(notesViewEntity.id, it, changeDescription)
 
-                    mainActivityViewModel.updateNote(
-                        noteId = notesViewEntity.id.toString(),
-                        newTitle = it,
-                        newDescription = changeDescription,
-                    )
                     mainActivityViewModel.updateNoteTitle(notesViewEntity.id, it)
                     mainActivityViewModel.updateNoteCategory(notesViewEntity.id, it)
                 },
                 textStyle =
-                    TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                    ),
+                TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                ),
             )
             TextField(
                 value = changeDescription,
                 onValueChange = {
                     changeDescription = it
                     mainActivityViewModel.updateNoteForMySQl(notesViewEntity.id, changeTitle, it)
-                    mainActivityViewModel.updateNote(
-                        noteId = notesViewEntity.id.toString(),
-                        newTitle = changeTitle,
-                        newDescription = it,
-                    )
                     mainActivityViewModel.updateNoteDescription(notesViewEntity.id, it)
                 },
                 modifier = Modifier.padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
@@ -136,9 +126,9 @@ fun BasicButton(mainActivityViewModel: MainActivityViewModel = MainActivityViewM
         ) {
             Column(
                 modifier =
-                    Modifier
-                        .verticalScroll(rememberScrollState())
-                        .weight(1f, false),
+                Modifier
+                    .verticalScroll(rememberScrollState())
+                    .weight(1f, false),
             ) {}
 
             Button(
@@ -161,16 +151,16 @@ fun ButtonTest(
 ) {
     Column(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.Blue),
+        Modifier
+            .fillMaxSize()
+            .background(Color.Blue),
     ) {
         Card(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(top = 20.dp),
+            Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(top = 20.dp),
         ) {
             TextField(
                 value = mainActivityViewModel.title,
@@ -184,10 +174,10 @@ fun ButtonTest(
         }
         Card(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(top = 30.dp),
+            Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(top = 30.dp),
         ) {
             TextField(
                 value = mainActivityViewModel.description,
@@ -202,8 +192,8 @@ fun ButtonTest(
         val context = LocalContext.current
 
         Button(onClick = {
-            mainActivityViewModel.addNewNoteMySql()
-            mainActivityViewModel.addNewNote()
+            mainActivityViewModel.addNewNoteMySql(context)
+            //mainActivityViewModel.addNewNote()
             mainActivityViewModel.addNewNoteForFb()
             mainActivityViewModel.buttonClicked = true
             //mainActivityViewModel.provideNoteListForFirebase()

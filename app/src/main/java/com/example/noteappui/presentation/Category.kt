@@ -29,18 +29,18 @@ fun Category(
 ) {
     Card(
         modifier =
-            modifier
-                .wrapContentWidth()
-                .height(27.dp)
-                .padding(end = 5.dp)
-                .clickable { onClick },
+        modifier
+            .wrapContentWidth()
+            .height(27.dp)
+            .padding(end = 5.dp)
+            .clickable { onClick },
     ) {
         Text(
             text = categoryViewEntity.category,
             modifier =
-                modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(start = 10.dp, end = 10.dp, top = 3.dp),
+            modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(start = 10.dp, end = 10.dp, top = 3.dp),
         )
     }
 }
@@ -55,9 +55,9 @@ fun AllCategory(mainActivityViewModel: MainActivityViewModel = MainActivityViewM
 
     LazyRow(
         modifier =
-            Modifier
-                .wrapContentSize()
-                .padding(top = 15.dp),
+        Modifier
+            .wrapContentSize()
+            .padding(top = 15.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item {

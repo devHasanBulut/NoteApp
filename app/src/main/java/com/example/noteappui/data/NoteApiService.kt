@@ -1,4 +1,4 @@
-package com.example.noteappui.repository
+package com.example.noteappui.data
 
 import com.example.noteappui.data.CategoryModel
 import com.example.noteappui.data.DateModel
@@ -6,7 +6,8 @@ import com.example.noteappui.data.NotesModel
 import retrofit2.Call
 import retrofit2.http.*
 
-interface NotesApiService {//
+
+interface NotesApiService {
 
     @GET("notes")
     fun getAllNotes(): Call<List<NotesModel>>
@@ -28,4 +29,5 @@ interface NotesApiService {//
 
     @GET ("notes")
     fun getAllDates(): Call<List<DateModel>>
+
 }

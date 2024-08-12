@@ -1,5 +1,6 @@
-package com.example.noteappui.repository
+package com.example.noteappui.data
 
+import androidx.compose.ui.platform.LocalContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

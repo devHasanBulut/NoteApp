@@ -116,6 +116,7 @@ class MainActivityViewModel : ViewModel() {
             dayList = GetDateViewEntityUseCase().execute()!!
         }
     }
+    //
 
     fun provideCategoryList() {
         viewModelScope.launch(Dispatchers.IO) {

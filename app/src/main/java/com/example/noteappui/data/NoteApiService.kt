@@ -24,6 +24,9 @@ interface NotesApiService {
     @DELETE("notes/{id}")
     fun deleteNote(@Path("id") id: Int): Call<Void>
 
+    @DELETE("notes")
+    fun deleteAllNotes(): Call<Void>
+
     @GET("notes")
     fun getAllCategories(): Call<List<CategoryModel>>
 

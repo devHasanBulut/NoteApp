@@ -21,7 +21,7 @@ class InsertNote {
         }
     }
 
-     fun TestAddNewNote(title: String, description: String, category: String, date: Long){
+     fun testAddNewNote(title: String, description: String, category: String, date: Long){
         val newNote = NotesModel(
             title = title,
             description = description,

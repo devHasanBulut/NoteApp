@@ -4,24 +4,22 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteappui.CheckNetConnect
 import com.example.noteappui.Dependencies.notesModelDao
-import com.example.noteappui.domain.GetCategoryViewEntityUseCase
-import com.example.noteappui.domain.GetDateViewEntityUseCase
-import com.example.noteappui.domain.GetNotesViewEntityUseCase
-import com.example.noteappui.domain.InsertNote
-import com.example.noteappui.domain.NewNoteForMySQL
-import com.example.noteappui.domain.UpdateNoteFromMySQL
 import com.example.noteappui.data.InsertNoteFb
 import com.example.noteappui.data.ReadCategoryFirebase
 import com.example.noteappui.data.ReadDateFirebase
 import com.example.noteappui.data.ReadNotesFirebase
 import com.example.noteappui.data.RetrofitClient
 import com.example.noteappui.data.UpdateNote
-import com.google.api.Context
+import com.example.noteappui.domain.GetCategoryViewEntityUseCase
+import com.example.noteappui.domain.GetDateViewEntityUseCase
+import com.example.noteappui.domain.GetNotesViewEntityUseCase
+import com.example.noteappui.domain.InsertNote
+import com.example.noteappui.domain.NewNoteForMySQL
+import com.example.noteappui.domain.UpdateNoteFromMySQL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -124,50 +122,42 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-
-
     fun addNewNoteMySql(context: android.content.Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val newNoteForMySQL = NewNoteForMySQL(
-                    title = title,
-                    description = description,
-                    category = title,
-                    date = System.currentTimeMillis(),
-                )
+            if (CheckNetConnect.isInternetAvailable(context)) {
+                try {
+                    val newNoteForMySQL = NewNoteForMySQL(
+                        title = title,
+                        description = description,
+                        category = title,
+                        date = System.currentTimeMillis(),
+                    )
 
-                if (CheckNetConnect.isInternetAvailable(context)){
+                    newNoteForMySQL.insertNoteDb()
                     val response = RetrofitClient.api.createNote(newNoteForMySQL.newNote).execute()
                     if (response.isSuccessful) {
-                        Log.d("MainActivityViewModel", "Not başarıyla eklendi")
                         provideNoteList()
                     } else {
-                        Log.e("MainActivityViewModel", "Hata: ${response.errorBody()?.string()}")
+                        Log.e("MainActivityViewModel", "Error: ${response.errorBody()?.string()}")
                     }
-                }else {
-                    newNoteForMySQL.insertNoteDb()
+                } catch (e: Exception) {
+                    Log.e("MainActivityViewModel", "Error: ${e.message}")
                 }
-
-            } catch (e: Exception) {
-                Log.e("MainActivityViewModel", "Hata: ${e.message}")
+            } else {
             }
         }
-//
     }
 
-    fun getAllNotesFromMySQL() {
+
+    fun getAllNotesFromMySQL(context: android.content.Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (CheckNetConnect.isInternetAvailable()) {
+            if (CheckNetConnect.isInternetAvailable(context)) {
                 try {
                     val response = RetrofitClient.api.getAllNotes().execute()
                     if (response.isSuccessful) {
                         noteListForMySql = response.body()!!.map {
                             NoteViewEntity(
-                                id = it.id,
-                                title = it.title,
-                                description = it.description,
-                                category = it.category,
-                                date = it.date.toString()
+                                id = it.id, title = it.title, description = it.description, category = it.category, date = it.date.toString()
                             )
                         }
                     } else {
@@ -182,7 +172,7 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun getAllCategoryFromMySQL(){
+    fun getAllCategoryFromMySQL() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitClient.api.getAllCategories().execute()
@@ -201,7 +191,7 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun getAllDateFromMySQL(){
+    fun getAllDateFromMySQL() {
         try {
             viewModelScope.launch(Dispatchers.IO) {
                 val response = RetrofitClient.api.getAllDates().execute()
@@ -210,19 +200,17 @@ class MainActivityViewModel : ViewModel() {
                     dateListForMySql = response.body()!!.map {
                         val calendar = java.util.Calendar.getInstance()
                         calendar.timeInMillis = it.date
-                        val dayName =
-                            calendar.getDisplayName(
-                                java.util.Calendar.DAY_OF_WEEK,
-                                java.util.Calendar.SHORT,
-                                java.util.Locale.getDefault(),
-                            )
+                        val dayName = calendar.getDisplayName(
+                            java.util.Calendar.DAY_OF_WEEK,
+                            java.util.Calendar.SHORT,
+                            java.util.Locale.getDefault(),
+                        )
                         val day = calendar.get(java.util.Calendar.DAY_OF_MONTH)
-                        val month =
-                            calendar.getDisplayName(
-                                java.util.Calendar.MONTH,
-                                java.util.Calendar.SHORT,
-                                java.util.Locale.getDefault(),
-                            )
+                        val month = calendar.getDisplayName(
+                            java.util.Calendar.MONTH,
+                            java.util.Calendar.SHORT,
+                            java.util.Locale.getDefault(),
+                        )
                         DateViewEntity(
                             dayName = dayName!!,
                             day = day,
@@ -241,14 +229,10 @@ class MainActivityViewModel : ViewModel() {
 
     fun updateNoteForMySQl(
         noteId: Int, newTitle: String, newDescription: String
-    ){
-        viewModelScope.launch(Dispatchers.IO){
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
             val updateNoteFromMySQLObject = UpdateNoteFromMySQL(
-                noteId = noteId,
-                title = newTitle,
-                description = newDescription,
-                category = newTitle,
-                date = System.currentTimeMillis()
+                noteId = noteId, title = newTitle, description = newDescription, category = newTitle, date = System.currentTimeMillis()
             )
             RetrofitClient.api.updateNote(noteId, updateNoteFromMySQLObject.updateNote).execute()
         }
@@ -259,7 +243,7 @@ class MainActivityViewModel : ViewModel() {
     private var insertNoteUseCase = InsertNote()
     private var insertNoteUseCaseFb = InsertNoteFb()
 
-    fun updateNote(
+    fun updateNoteFirebase(
         noteId: String, newTitle: String, newDescription: String
     ) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -271,7 +255,7 @@ class MainActivityViewModel : ViewModel() {
 
     }
 
-    fun addNewNoteForFb() {
+    fun addNewNoteForFirebase() {
         viewModelScope.launch(Dispatchers.IO) {
             insertNoteUseCaseFb.addNewNote(
                 title = title,
@@ -282,15 +266,15 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun testAddNoteWithSQL(){
+    fun testAddNoteWithSQL() {
         viewModelScope.launch(Dispatchers.IO) {
             insertNoteUseCase.addNewNoteDb()
         }
     }
 
-    fun addNewNote() {
+    fun addNewNoteDb() {
         viewModelScope.launch(Dispatchers.IO) {
-            insertNoteUseCase.TestAddNewNote(
+            insertNoteUseCase.testAddNewNote(
                 title = title,
                 description = description,
                 category = title,
@@ -300,7 +284,7 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun updateNoteTitle(
+    fun updateNoteTitleDb(
         noteId: Int,
         newTitle: String,
     ) {
@@ -314,7 +298,7 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun updateNoteDescription(
+    fun updateNoteDescriptionDb(
         noteId: Int,
         newDescription: String,
     ) {
@@ -328,7 +312,7 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun updateNoteCategory(
+    fun updateNoteCategoryDb(
         noteId: Int,
         newCategory: String,
     ) {

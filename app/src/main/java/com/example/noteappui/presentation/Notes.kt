@@ -92,8 +92,8 @@ fun Notes(
                     changeTitle = it
                     mainActivityViewModel.updateNoteForMySQl(notesViewEntity.id, it, changeDescription)
 
-                    mainActivityViewModel.updateNoteTitle(notesViewEntity.id, it)
-                    mainActivityViewModel.updateNoteCategory(notesViewEntity.id, it)
+                    mainActivityViewModel.updateNoteTitleDb(notesViewEntity.id, it)
+                    mainActivityViewModel.updateNoteCategoryDb(notesViewEntity.id, it)
                 },
                 textStyle =
                 TextStyle(
@@ -106,7 +106,7 @@ fun Notes(
                 onValueChange = {
                     changeDescription = it
                     mainActivityViewModel.updateNoteForMySQl(notesViewEntity.id, changeTitle, it)
-                    mainActivityViewModel.updateNoteDescription(notesViewEntity.id, it)
+                    mainActivityViewModel.updateNoteDescriptionDb(notesViewEntity.id, it)
                 },
                 modifier = Modifier.padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
             )
@@ -194,7 +194,7 @@ fun ButtonTest(
         Button(onClick = {
             mainActivityViewModel.addNewNoteMySql(context)
             //mainActivityViewModel.addNewNote()
-            mainActivityViewModel.addNewNoteForFb()
+            //mainActivityViewModel.addNewNoteForFb()
             mainActivityViewModel.buttonClicked = true
             //mainActivityViewModel.provideNoteListForFirebase()
             val intent = Intent(context, MainActivity::class.java)

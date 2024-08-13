@@ -23,17 +23,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Suppress("ktlint:compose:modifier-missing-check", "ktlint:standard:function-naming")
 @Composable
 fun AllDate(mainActivityViewModel: MainActivityViewModel) {
+    val context = LocalContext.current
     LaunchedEffect(true) {
         mainActivityViewModel.getAllDateFromMySQL()
         Log.d(
             "ALL DATE",
-            "test launched effect: ${mainActivityViewModel.getAllNotesFromMySQL()}",
+            "test launched effect: ${mainActivityViewModel.getAllNotesFromMySQL(context)}",
         )
     }
     val uniqueDayList = mainActivityViewModel.dateListForMySql.distinctBy { it }

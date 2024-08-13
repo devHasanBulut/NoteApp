@@ -152,7 +152,7 @@ class MainActivityViewModel : ViewModel() {
                 Log.e("MainActivityViewModel", "Hata: ${e.message}")
             }
         }
-
+//
     }
 
     fun getAllNotesFromMySQL() {

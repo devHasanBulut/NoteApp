@@ -1,25 +1,40 @@
 package com.example.noteappui.data
 
-import androidx.compose.runtime.currentCompositionLocalContext
-import androidx.compose.ui.platform.LocalContext
+import android.content.Context
+import android.util.Log
 import com.example.noteappui.CheckNetConnect
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import kotlin.coroutines.coroutineContext
+import java.util.concurrent.TimeUnit
 
+val checkNetConnect = CheckNetConnect
+class TestRetrofit {
+    companion object {
+        private var instance: Retrofit? = null
+        private var context: Context? = null
 
-object RetrofitClient {
-    private const val BASE_URL = "http://192.168.1.35:8080/"
+        fun init(context: Context) {
+            this.context = context
+        }
+        fun getInstance(): Retrofit? {
+            if (instance == null && checkNetConnect.isInternetAvailable(context!!)) {
+                    val okHttpClient = OkHttpClient.Builder()
+                        .connectTimeout(130, TimeUnit.SECONDS)  // Connection timeout
+                        .writeTimeout(130, TimeUnit.SECONDS)    // Write timeout
+                        .readTimeout(130, TimeUnit.SECONDS)
+                        .build()
 
-    val instance: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+                    instance = Retrofit.Builder()
+                        .baseUrl("http://192.168.1.35:8080/")
+                        .client(okHttpClient)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
 
-    val api: NotesApiService by lazy {
-        instance.create(NotesApiService::class.java)
+            } else {
+                Log.d("TAG", "No internet connection")
+            }
+            return instance
+        }
     }
 }
-

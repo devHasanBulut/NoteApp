@@ -1,5 +1,6 @@
 package com.example.noteappui.presentation
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,10 +10,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.noteappui.CheckNetConnect
 import com.example.noteappui.Dependencies.notesModelDao
 import com.example.noteappui.data.InsertNoteFb
+import com.example.noteappui.data.NotesApiService
 import com.example.noteappui.data.ReadCategoryFirebase
 import com.example.noteappui.data.ReadDateFirebase
 import com.example.noteappui.data.ReadNotesFirebase
-import com.example.noteappui.data.RetrofitClient
+import com.example.noteappui.data.TestRetrofit
 import com.example.noteappui.data.UpdateNote
 import com.example.noteappui.domain.GetCategoryViewEntityUseCase
 import com.example.noteappui.domain.GetDateViewEntityUseCase
@@ -24,6 +26,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel : ViewModel() {
+
+    val testRetrofit = TestRetrofit()
+
     var dayList by mutableStateOf(emptyList<DateViewEntity>())
 
     var noteList by mutableStateOf(emptyList<NoteViewEntity>())
@@ -118,7 +123,7 @@ class MainActivityViewModel : ViewModel() {
 
     fun provideNoteList() {
         viewModelScope.launch(Dispatchers.IO) {
-            noteList = GetNotesViewEntityUseCase(notesModelDao!!).execute()!!
+            noteList = GetNotesViewEntityUseCase().execute()!!
         }
     }
 
@@ -134,7 +139,10 @@ class MainActivityViewModel : ViewModel() {
                     )
 //
                     newNoteForMySQL.insertNoteDb()
-                    val response = RetrofitClient.api.createNote(newNoteForMySQL.newNote).execute()
+                    //val response = RetrofitClient.api.createNote(newNoteForMySQL.newNote).execute()
+                    val response = TestRetrofit.getInstance()!!.create(NotesApiService::class.java).createNote(
+                        newNoteForMySQL.newNote
+                    ).execute()
                     if (response.isSuccessful) {
                         provideNoteList()
                     } else {
@@ -153,7 +161,7 @@ class MainActivityViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             if (CheckNetConnect.isInternetAvailable(context)) {
                 try {
-                    val response = RetrofitClient.api.getAllNotes().execute()
+                    val response = TestRetrofit.getInstance()!!.create(NotesApiService::class.java).getAllNotes().execute()
                     if (response.isSuccessful) {
                         noteListForMySql = response.body()!!.map {
                             NoteViewEntity(
@@ -175,7 +183,8 @@ class MainActivityViewModel : ViewModel() {
     fun getAllCategoryFromMySQL() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitClient.api.getAllCategories().execute()
+               // val response = RetrofitClient.api.getAllCategories().execute()
+                val response = TestRetrofit.getInstance()!!.create(NotesApiService::class.java).getAllCategories().execute()
                 if (response.isSuccessful) {
                     categoryListForMySql = response.body()!!.map {
                         CategoryViewEntity(
@@ -194,7 +203,8 @@ class MainActivityViewModel : ViewModel() {
     fun getAllDateFromMySQL() {
         try {
             viewModelScope.launch(Dispatchers.IO) {
-                val response = RetrofitClient.api.getAllDates().execute()
+                //val response = RetrofitClient.api.getAllDates().execute()
+                val response = TestRetrofit.getInstance()!!.create(NotesApiService::class.java).getAllDates().execute()
 
                 if (response.isSuccessful) {
                     dateListForMySql = response.body()!!.map {
@@ -234,7 +244,10 @@ class MainActivityViewModel : ViewModel() {
             val updateNoteFromMySQLObject = UpdateNoteFromMySQL(
                 noteId = noteId, title = newTitle, description = newDescription, category = newTitle, date = System.currentTimeMillis()
             )
-            RetrofitClient.api.updateNote(noteId, updateNoteFromMySQLObject.updateNote).execute()
+            TestRetrofit.getInstance()!!.create(NotesApiService::class.java).updateNote(
+                noteId, updateNoteFromMySQLObject.updateNote
+            ).execute()
+          //  RetrofitClient.api.updateNote(noteId, updateNoteFromMySQLObject.updateNote).execute()
         }
     }
 

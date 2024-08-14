@@ -1,8 +1,9 @@
 package com.example.noteappui.domain
 
 import com.example.noteappui.Dependencies.notesModelDao
+import com.example.noteappui.data.NotesApiService
 import com.example.noteappui.data.NotesModel
-import com.example.noteappui.data.RetrofitClient
+import com.example.noteappui.data.TestRetrofit
 
 class InsertNote {
 
@@ -12,7 +13,7 @@ class InsertNote {
     }
 
     fun addNewNoteDb(){
-        val response = RetrofitClient.api.getAllNotes().execute()
+        val response = TestRetrofit.getInstance().create(NotesApiService::class.java).getAllNotes().execute()
         if (response.isSuccessful){
             val notes = response.body()
             notes?.forEach {

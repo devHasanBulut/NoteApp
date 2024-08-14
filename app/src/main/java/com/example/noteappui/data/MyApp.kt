@@ -6,6 +6,7 @@ import com.example.noteappui.Dependencies
 class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        TestRetrofit.init(this)
         Dependencies.init(this)
     }
 }

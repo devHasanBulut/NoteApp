@@ -51,7 +51,6 @@ fun AllNotes(
 ) {
     LaunchedEffect(true) {
         mainActivityViewModel.provideNoteList()
-        //
     }
 
     LazyVerticalStaggeredGrid(
@@ -134,6 +133,7 @@ fun BasicButton(mainActivityViewModel: MainActivityViewModel = MainActivityViewM
             Button(
                 onClick = {
                     mainActivityViewModel.buttonClicked = true
+                    mainActivityViewModel.testAddNoteWithSQL()
                 },
                 modifier = Modifier.padding(end = 2.dp),
             ) {
@@ -194,9 +194,7 @@ fun ButtonTest(
         Button(onClick = {
             mainActivityViewModel.addNewNoteMySql(context)
             //mainActivityViewModel.addNewNote()
-            //mainActivityViewModel.addNewNoteForFb()
             mainActivityViewModel.buttonClicked = true
-            //mainActivityViewModel.provideNoteListForFirebase()
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
         }) {
@@ -227,7 +225,6 @@ fun OnClick(
     onClick: Unit,
 ) {
     CoroutineScope(Dispatchers.IO).launch {
-        //mainActivityViewModel.provideNoteListForFirebase()
         withContext(Dispatchers.Main) {
             mainActivityViewModel.buttonClicked = false
         }

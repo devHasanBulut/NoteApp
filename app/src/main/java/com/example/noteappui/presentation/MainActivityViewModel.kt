@@ -132,7 +132,7 @@ class MainActivityViewModel : ViewModel() {
                         category = title,
                         date = System.currentTimeMillis(),
                     )
-
+//
                     newNoteForMySQL.insertNoteDb()
                     val response = RetrofitClient.api.createNote(newNoteForMySQL.newNote).execute()
                     if (response.isSuccessful) {

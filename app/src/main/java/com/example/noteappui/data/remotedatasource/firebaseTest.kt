@@ -1,4 +1,4 @@
-package com.example.noteappui.data
+package com.example.noteappui.data.remotedatasource
 
 import android.util.Log
 import com.example.noteappui.presentation.DateViewEntity

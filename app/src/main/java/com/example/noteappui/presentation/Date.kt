@@ -30,16 +30,7 @@ import androidx.compose.ui.unit.dp
 @Suppress("ktlint:compose:modifier-missing-check", "ktlint:standard:function-naming")
 @Composable
 fun AllDate(mainActivityViewModel: MainActivityViewModel) {
-    val context = LocalContext.current
-    LaunchedEffect(true) {
-        mainActivityViewModel.getAllDateFromMySQL()
-        Log.d(
-            "ALL DATE",
-            "test launched effect: ${mainActivityViewModel.getAllNotesFromMySQL(context)}",
-        )
-    }
-    val uniqueDayList = mainActivityViewModel.dateListForMySql.distinctBy { it }
-    Log.d("test unique", "uniqueDayList: $uniqueDayList")
+    val uniqueDayList = mainActivityViewModel.dayList.distinctBy { it }
 
     LazyRow(
         modifier = Modifier
@@ -101,7 +92,7 @@ private fun Date(
 
 @Suppress("ktlint:compose:modifier-missing-check", "ktlint:standard:function-naming")
 @Composable
-fun NewColumnContent(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()) {
+fun NewColumnContent(mainActivityViewModel: MainActivityViewModel) {
     if (mainActivityViewModel.dateClicked) {
         Column(
             modifier = Modifier

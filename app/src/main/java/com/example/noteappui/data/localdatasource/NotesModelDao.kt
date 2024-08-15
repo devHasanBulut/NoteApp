@@ -1,14 +1,15 @@
-package com.example.noteappui.data
+package com.example.noteappui.data.localdatasource
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.noteappui.presentation.NoteViewEntity
 
 
 @Dao
+
 interface NotesModelDao {
     @Query("SELECT * FROM notes")
     fun getAllNotes(): List<NotesModel>
@@ -19,22 +20,19 @@ interface NotesModelDao {
     @Insert
     fun insertNote(notesModel: NotesModel)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAllNotes(notesModel: List<NotesModel>)
+
     @Delete
     fun deleteNote(notesModel: NotesModel)
-
-    @Update
-    fun updateNoteCategory(notesModel: NotesModel)
-
-    @Update
-    fun updateNoteTitle(notesModel: NotesModel)
-
-    @Update
-    fun updateNoteDescription(notesModel: NotesModel)
 
     @Query("SELECT category FROM notes")
     fun getAllCategory(): List<CategoryModel>
 
     @Query("SELECT date FROM notes")
     fun getAllDate(): List<DateModel>
+
+    @Update
+    fun updateNote(notesModel: NotesModel)
 
 }

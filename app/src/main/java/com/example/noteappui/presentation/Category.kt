@@ -46,13 +46,8 @@ fun Category(
 }
 
 @Composable
-fun AllCategory(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()) {
-    LaunchedEffect(true) {
-        mainActivityViewModel.getAllCategoryFromMySQL()
-    }
-
+fun AllCategory(mainActivityViewModel: MainActivityViewModel) {
     var selectedCategory: CategoryViewEntity? by remember { mutableStateOf(null) }
-
     LazyRow(
         modifier =
         Modifier
@@ -61,7 +56,7 @@ fun AllCategory(mainActivityViewModel: MainActivityViewModel = MainActivityViewM
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item {
-            mainActivityViewModel.categoryListForMySql.forEach { category ->
+            mainActivityViewModel.categoryList.forEach { category ->
                 Category(categoryViewEntity = category, onClick = { selectedCategory = category })
             }
         }

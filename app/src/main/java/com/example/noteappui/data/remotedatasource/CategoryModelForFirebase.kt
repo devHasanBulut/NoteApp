@@ -1,4 +1,4 @@
-package com.example.noteappui.data
+package com.example.noteappui.data.remotedatasource
 
 class CategoryModelForFirebase(
     var category: String = ""

@@ -46,7 +46,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun AllNotes(
-    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
+    mainActivityViewModel: MainActivityViewModel,
     modifier: Modifier = Modifier,
 ) {
     LaunchedEffect(true) {
@@ -55,8 +55,7 @@ fun AllNotes(
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
-        modifier =
-        modifier
+        modifier = modifier
             .wrapContentSize()
             .padding(top = 25.dp),
         contentPadding = PaddingValues(16.dp),
@@ -64,7 +63,7 @@ fun AllNotes(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(mainActivityViewModel.noteList) { note ->
-            Notes(notesViewEntity = note)
+            Notes(notesViewEntity = note, mainActivityViewModel = mainActivityViewModel)
         }
     }
 }
@@ -73,7 +72,7 @@ fun AllNotes(
 fun Notes(
     notesViewEntity: NoteViewEntity,
     modifier: Modifier = Modifier,
-    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
+    mainActivityViewModel: MainActivityViewModel,
 ) {
     var changeTitle by remember { mutableStateOf(notesViewEntity.title) }
 
@@ -89,13 +88,9 @@ fun Notes(
                 value = changeTitle,
                 onValueChange = {
                     changeTitle = it
-                    mainActivityViewModel.updateNoteForMySQl(notesViewEntity.id, it, changeDescription)
-
-                    mainActivityViewModel.updateNoteTitleDb(notesViewEntity.id, it)
-                    mainActivityViewModel.updateNoteCategoryDb(notesViewEntity.id, it)
+                    mainActivityViewModel.updateNote(notesViewEntity.apply { title = changeTitle})
                 },
-                textStyle =
-                TextStyle(
+                textStyle = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                 ),
@@ -104,8 +99,7 @@ fun Notes(
                 value = changeDescription,
                 onValueChange = {
                     changeDescription = it
-                    mainActivityViewModel.updateNoteForMySQl(notesViewEntity.id, changeTitle, it)
-                    mainActivityViewModel.updateNoteDescriptionDb(notesViewEntity.id, it)
+                    mainActivityViewModel.updateNote(notesViewEntity.apply { description = changeDescription})
                 },
                 modifier = Modifier.padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
             )
@@ -114,18 +108,18 @@ fun Notes(
 }
 
 @Composable
-fun BasicButton(mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()) {
+fun BasicButton(mainActivityViewModel: MainActivityViewModel) {
     if (mainActivityViewModel.buttonClicked) {
-        ButtonTest {
+        ButtonTest(mainActivityViewModel) {
             mainActivityViewModel.buttonClicked = false
+
         }
     } else {
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(
-                modifier =
-                Modifier
+                modifier = Modifier
                     .verticalScroll(rememberScrollState())
                     .weight(1f, false),
             ) {}
@@ -133,7 +127,6 @@ fun BasicButton(mainActivityViewModel: MainActivityViewModel = MainActivityViewM
             Button(
                 onClick = {
                     mainActivityViewModel.buttonClicked = true
-                    mainActivityViewModel.testAddNoteWithSQL()
                 },
                 modifier = Modifier.padding(end = 2.dp),
             ) {
@@ -146,18 +139,16 @@ fun BasicButton(mainActivityViewModel: MainActivityViewModel = MainActivityViewM
 @Suppress("UNUSED_EXPRESSION")
 @Composable
 fun ButtonTest(
-    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
+    mainActivityViewModel: MainActivityViewModel,
     pressBack: () -> Unit,
 ) {
     Column(
-        modifier =
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color.Blue),
     ) {
         Card(
-            modifier =
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(top = 20.dp),
@@ -173,8 +164,7 @@ fun ButtonTest(
             )
         }
         Card(
-            modifier =
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(top = 30.dp),
@@ -192,8 +182,7 @@ fun ButtonTest(
         val context = LocalContext.current
 
         Button(onClick = {
-            mainActivityViewModel.addNewNoteMySql(context)
-            //mainActivityViewModel.addNewNote()
+            mainActivityViewModel.insertNote()
             mainActivityViewModel.buttonClicked = true
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
@@ -202,6 +191,7 @@ fun ButtonTest(
         }
         if (mainActivityViewModel.buttonClicked) {
             OnClick(
+                mainActivityViewModel = mainActivityViewModel,
                 onClick = Unit,
             )
         }
@@ -221,7 +211,7 @@ fun ButtonTest(
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun OnClick(
-    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel(),
+    mainActivityViewModel: MainActivityViewModel,
     onClick: Unit,
 ) {
     CoroutineScope(Dispatchers.IO).launch {

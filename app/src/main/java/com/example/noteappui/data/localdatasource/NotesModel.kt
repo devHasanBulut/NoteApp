@@ -1,4 +1,4 @@
-package com.example.noteappui.data
+package com.example.noteappui.data.localdatasource
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

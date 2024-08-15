@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SearchBar(
-    mainActivityViewModel: MainActivityViewModel = MainActivityViewModel()
+    mainActivityViewModel: MainActivityViewModel
 ){
     Row(
         modifier = Modifier.wrapContentSize()

@@ -1,9 +1,12 @@
 package com.example.noteappui.repository
 
 import com.example.noteappui.NetworkChecker
+import com.example.noteappui.data.localdatasource.CategoryModel
+import com.example.noteappui.data.localdatasource.DateModel
 import com.example.noteappui.data.localdatasource.NotesModel
 import com.example.noteappui.data.localdatasource.NotesModelDao
 import com.example.noteappui.data.remotedatasource.NotesApiService
+import com.example.noteappui.presentation.DateViewEntity
 
 class NoteRepository(
     private val noteDao: NotesModelDao, private val notesApiService: NotesApiService, private val networkChecker: NetworkChecker
@@ -16,6 +19,28 @@ class NoteRepository(
             }
         } else {
             noteDao.getAllNotes()
+        }
+    }
+
+    suspend fun getCategory(): List<CategoryModel>{
+        return if(networkChecker.isInternetAvailable()){
+            notesApiService.getAllCategories().let { categories->
+                noteDao.getAllCategory()
+                categories
+            }
+        } else {
+            noteDao.getAllCategory()
+        }
+    }
+
+    suspend fun getDate(): List<DateModel>{
+        return if(networkChecker.isInternetAvailable()){
+            notesApiService.getAllDates().let { dates->
+                noteDao.getAllDate()
+                dates
+            }
+        } else {
+           noteDao.getAllDate()
         }
     }
 

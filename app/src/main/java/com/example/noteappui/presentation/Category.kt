@@ -2,6 +2,7 @@
 
 package com.example.noteappui.presentation
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.height
@@ -26,6 +27,7 @@ fun Category(
     categoryViewEntity: CategoryViewEntity,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
+
 ) {
     Card(
         modifier =
@@ -48,6 +50,9 @@ fun Category(
 @Composable
 fun AllCategory(mainActivityViewModel: MainActivityViewModel) {
     var selectedCategory: CategoryViewEntity? by remember { mutableStateOf(null) }
+    LaunchedEffect (true){
+        mainActivityViewModel.provideCategoryList()
+    }
     LazyRow(
         modifier =
         Modifier
@@ -57,7 +62,13 @@ fun AllCategory(mainActivityViewModel: MainActivityViewModel) {
     ) {
         item {
             mainActivityViewModel.categoryList.forEach { category ->
-                Category(categoryViewEntity = category, onClick = { selectedCategory = category })
+                Log.d("Category",mainActivityViewModel.categoryList.toString())
+                Category(
+                    categoryViewEntity = category,
+                    onClick = {
+                        selectedCategory = category
+                    }
+                )
             }
         }
     }

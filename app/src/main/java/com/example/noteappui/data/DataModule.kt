@@ -35,8 +35,6 @@ object DataModule {
     @Provides
     fun provideNotesModelDao(appDatabase: AppDatabase) = appDatabase.notesModelDao()
 
-    //
-
     @Singleton
     @Provides
     fun provideOkHttpClient(): OkHttpClient {

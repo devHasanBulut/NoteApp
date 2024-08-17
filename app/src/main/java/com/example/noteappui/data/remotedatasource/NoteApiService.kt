@@ -27,7 +27,7 @@ interface NotesApiService {
     suspend fun updateNote(@Path("id") id: Int, @Body note: NotesModel)
 
     @DELETE("notes/{id}")
-    suspend fun deleteNote(@Path("id") id: Int): Call<Void>
+    suspend fun deleteNote(@Path("id") id: Int)
 
     @DELETE("notes")
     suspend fun deleteAllNotes()

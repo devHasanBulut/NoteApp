@@ -16,6 +16,16 @@ object DomainModule {
     }
 
     @Provides
+    fun provideGetCategoryUseCase(noteRepository: NoteRepository): GetCategoryUseCase {
+        return GetCategoryUseCase(noteRepository)
+    }
+
+    @Provides
+    fun provideGetDateUseCase(noteRepository: NoteRepository): GetDateUseCase {
+        return GetDateUseCase(noteRepository)
+    }
+
+    @Provides
     fun provideCreateNoteViewEntityUseCase(noteRepository: NoteRepository): InsertNoteUseCase {
         return InsertNoteUseCase(noteRepository)
     }

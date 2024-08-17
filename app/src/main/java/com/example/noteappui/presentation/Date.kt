@@ -30,7 +30,9 @@ import androidx.compose.ui.unit.dp
 @Suppress("ktlint:compose:modifier-missing-check", "ktlint:standard:function-naming")
 @Composable
 fun AllDate(mainActivityViewModel: MainActivityViewModel) {
-    val uniqueDayList = mainActivityViewModel.dayList.distinctBy { it }
+    LaunchedEffect(true) {
+        mainActivityViewModel.provideDateList()
+    }
 
     LazyRow(
         modifier = Modifier
@@ -39,7 +41,7 @@ fun AllDate(mainActivityViewModel: MainActivityViewModel) {
             .padding(top = 15.dp, start = 15.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(uniqueDayList) { dateModel ->
+        items(mainActivityViewModel.dayList) { dateModel ->
             Date(dateViewEntity = dateModel)
         }
     }
@@ -58,6 +60,7 @@ private fun Date(
     selectedDate: DateViewEntity? = null,
     onDateSelected: (DateViewEntity) -> Unit = {},
 ) {
+
     Row(
         modifier = modifier.wrapContentSize(),
     ) {
@@ -89,19 +92,6 @@ private fun Date(
         }
     }
 }
-
-@Suppress("ktlint:compose:modifier-missing-check", "ktlint:standard:function-naming")
-@Composable
-fun NewColumnContent(mainActivityViewModel: MainActivityViewModel) {
-    if (mainActivityViewModel.dateClicked) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Yellow),
-        ) {}
-    }
-}
-
 data class DateViewEntity(
     val dayName: String,
     val day: Int,

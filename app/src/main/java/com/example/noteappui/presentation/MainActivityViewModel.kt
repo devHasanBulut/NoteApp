@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.noteappui.domain.GetCategoryUseCase
+import com.example.noteappui.domain.GetDateUseCase
 import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import com.example.noteappui.domain.InsertNoteUseCase
@@ -17,6 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     private val getNotesUseCase: GetNotesViewEntityUseCase,
+    private val getDateUseCase: GetDateUseCase,
+    private val getCategoryUseCase: GetCategoryUseCase,
     private val insertNoteUseCase: InsertNoteUseCase,
     private val getDateViewEntityUseCase: GetDateViewEntityUseCase,
     private val updateNoteUseCase: UpdateNoteUseCase
@@ -45,14 +49,19 @@ class MainActivityViewModel @Inject constructor(
 
     fun provideNoteList() {
         viewModelScope.launch(Dispatchers.IO) {
-            noteList = getNotesUseCase.execute().also {
-                categoryList = noteList.map {
-                    CategoryViewEntity(
-                        category = it.category
-                    )
-                }.distinct()
-                dayList = getDateViewEntityUseCase.execute(noteList).distinct()
-            }
+            noteList = getNotesUseCase.execute()
+        }
+    }
+
+    fun provideCategoryList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            categoryList = getCategoryUseCase.execute().distinct()
+        }
+    }
+
+    fun provideDateList(){
+        viewModelScope.launch(Dispatchers.IO) {
+            dayList = getDateUseCase.execute().distinct()
         }
     }
 

@@ -65,6 +65,8 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+    //
+
     fun insertNote() {
         viewModelScope.launch(Dispatchers.IO) {
             insertNoteUseCase.execute(title, description)

@@ -14,10 +14,10 @@ fun MainMenu(
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
-        // verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        BasicButton(mainActivityViewModel = mainActivityViewModel)
+        //
+        NewNoteButton(mainActivityViewModel = mainActivityViewModel)
         SearchBar(mainActivityViewModel = mainActivityViewModel)
         AllDate(mainActivityViewModel = mainActivityViewModel)
         AllCategory(mainActivityViewModel = mainActivityViewModel)

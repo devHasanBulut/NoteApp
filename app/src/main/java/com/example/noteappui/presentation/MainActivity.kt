@@ -18,9 +18,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val mainActivityViewModel: MainActivityViewModel by viewModels()
+   private val mainActivityViewModel: MainActivityViewModel by viewModels()
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    @SuppressLint("CoroutineCreationDuringComposition", "MissingInflatedId")
+    @SuppressLint("CoroutineCreationDuringComposition", "MissingInflatedId", "ObsoleteSdkInt")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
             window.statusBarColor = getColor(R.color.black)
             NoteAppUITheme {
                 MainMenu(Modifier, mainActivityViewModel)
+
             }
         }
     }

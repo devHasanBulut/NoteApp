@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteappui.domain.GetCategoryUseCase
 import com.example.noteappui.domain.GetDateUseCase
-import com.example.noteappui.domain.GetDateViewEntityUseCase
 import com.example.noteappui.domain.GetNotesViewEntityUseCase
 import com.example.noteappui.domain.InsertNoteUseCase
 import com.example.noteappui.domain.UpdateNoteUseCase
@@ -22,7 +21,6 @@ class MainActivityViewModel @Inject constructor(
     private val getDateUseCase: GetDateUseCase,
     private val getCategoryUseCase: GetCategoryUseCase,
     private val insertNoteUseCase: InsertNoteUseCase,
-    private val getDateViewEntityUseCase: GetDateViewEntityUseCase,
     private val updateNoteUseCase: UpdateNoteUseCase
 ) : ViewModel(
 ) {
@@ -38,14 +36,9 @@ class MainActivityViewModel @Inject constructor(
     var active by mutableStateOf(false)
         private set
 
-    var buttonClicked by mutableStateOf(false)
-
     var title by mutableStateOf("")
 
     var description by mutableStateOf("")
-
-    var dateClicked by mutableStateOf(false)
-
 
     fun provideNoteList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -59,7 +52,7 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
-    fun provideDateList(){
+    fun provideDateList() {
         viewModelScope.launch(Dispatchers.IO) {
             dayList = getDateUseCase.execute().distinct()
         }
@@ -79,15 +72,17 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
-    fun onQueryChange(it: String) {
-
+    fun onQueryChange(query: String) {
+        text = query
     }
 
     fun onSearch() {
+        active = false
+        title = "search results"
     }
 
-    fun onActiveChange(b: Boolean) {
-
+    fun onActiveChange(isActive: Boolean) {
+        active = isActive
     }
 
 }

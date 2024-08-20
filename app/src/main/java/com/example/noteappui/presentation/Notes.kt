@@ -1,6 +1,5 @@
 package com.example.noteappui.presentation
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,10 +38,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun AllNotes(
@@ -52,7 +47,6 @@ fun AllNotes(
     LaunchedEffect(true) {
         mainActivityViewModel.provideNoteList()
     }
-
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = modifier
@@ -88,7 +82,7 @@ fun Notes(
                 value = changeTitle,
                 onValueChange = {
                     changeTitle = it
-                    mainActivityViewModel.updateNote(notesViewEntity.apply { title = changeTitle})
+                    mainActivityViewModel.updateNote(notesViewEntity.apply { title = changeTitle })
                 },
                 textStyle = TextStyle(
                     fontWeight = FontWeight.Bold,
@@ -99,7 +93,7 @@ fun Notes(
                 value = changeDescription,
                 onValueChange = {
                     changeDescription = it
-                    mainActivityViewModel.updateNote(notesViewEntity.apply { description = changeDescription})
+                    mainActivityViewModel.updateNote(notesViewEntity.apply { description = changeDescription })
                 },
                 modifier = Modifier.padding(start = 20.dp, top = 7.dp, bottom = 15.dp),
             )
@@ -108,37 +102,36 @@ fun Notes(
 }
 
 @Composable
-fun BasicButton(mainActivityViewModel: MainActivityViewModel) {
-    if (mainActivityViewModel.buttonClicked) {
-        ButtonTest(mainActivityViewModel) {
-            mainActivityViewModel.buttonClicked = false
-
+fun NewNoteButton(mainActivityViewModel: MainActivityViewModel) {
+    val clicked = remember { mutableStateOf(false) }
+    if (clicked.value) {
+        NewScreen(mainActivityViewModel) {
+            clicked.value = false
         }
-    } else {
+        return
+    }
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
         Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .weight(1f, false),
-            ) {}
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .weight(1f, false),
+        ) {}
 
-            Button(
-                onClick = {
-                    mainActivityViewModel.buttonClicked = true
-                },
-                modifier = Modifier.padding(end = 2.dp),
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "add button")
-            }
+        Button(
+            onClick = {
+                clicked.value = true
+            },
+            modifier = Modifier.padding(end = 2.dp),
+        ) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "add button")
         }
     }
 }
 
-@Suppress("UNUSED_EXPRESSION")
 @Composable
-fun ButtonTest(
+fun NewScreen(
     mainActivityViewModel: MainActivityViewModel,
     pressBack: () -> Unit,
 ) {
@@ -183,19 +176,11 @@ fun ButtonTest(
 
         Button(onClick = {
             mainActivityViewModel.insertNote()
-            mainActivityViewModel.buttonClicked = true
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
         }) {
             Text("Save")
         }
-        if (mainActivityViewModel.buttonClicked) {
-            OnClick(
-                mainActivityViewModel = mainActivityViewModel,
-                onClick = Unit,
-            )
-        }
-
         IconButton(
             onClick = { pressBack() },
             modifier = Modifier.size(40.dp),
@@ -204,19 +189,6 @@ fun ButtonTest(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "back button",
             )
-        }
-    }
-}
-
-@SuppressLint("CoroutineCreationDuringComposition")
-@Composable
-fun OnClick(
-    mainActivityViewModel: MainActivityViewModel,
-    onClick: Unit,
-) {
-    CoroutineScope(Dispatchers.IO).launch {
-        withContext(Dispatchers.Main) {
-            mainActivityViewModel.buttonClicked = false
         }
     }
 }
